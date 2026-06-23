@@ -167,12 +167,15 @@
 
         /* Accordion Body Smooth Transition */
         .card-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background: transparent;
-        }
-
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s ease-out;
+    background: transparent;
+}
+        
+.glass-card.open > .card-body {
+    grid-template-rows: 1fr;
+}
         .card-content-inner {
             padding: 4px 24px 24px 24px;
             font-size: 14.5px;
@@ -544,19 +547,18 @@
         function toggleAccordion(element, event) {
             if(event) event.stopPropagation();
             const card = element.parentElement;
-            const body = card.querySelector('.card-body');
-            const isOpen = card.classList.contains('open');
-
-            // ปิด Accordion อันอื่นในระดับเดียวกัน
+            
+            // ปิดตัวอื่นในระดับเดียวกัน (optional)
             if(!element.classList.contains('sub-header')) {
                 const siblings = card.parentElement.children;
                 for(let sibling of siblings) {
-                    if(sibling !== card && sibling.classList.contains('open')) {
-                        sibling.classList.remove('open');
-                        sibling.querySelector('.card-body').style.maxHeight = null;
-                    }
+                    if(sibling !== card) sibling.classList.remove('open');
                 }
             }
+            
+            // Toggle เปิด-ปิด
+            card.classList.toggle('open');
+        }
 
             if (isOpen) {
                 card.classList.remove('open');
