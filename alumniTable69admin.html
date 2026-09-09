@@ -7,92 +7,95 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0F172A;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --gold: #D4AF37;
+            --bg-color: #0F172A; --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08); --gold: #D4AF37;
         }
         body { 
-            font-family: 'Prompt', sans-serif; background: var(--bg-color); color: white; padding: 20px; 
-            overflow-x: hidden;
+            font-family: 'Prompt', sans-serif; background: var(--bg-color); color: white; padding: 15px; 
+            overflow-x: hidden; margin: 0;
         }
         
-        /* Background Detail */
         body::before {
             content: ''; position: fixed; top: -20%; left: -10%; width: 50%; height: 50%;
             background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%); z-index: -1;
         }
-        body::after {
-            content: ''; position: fixed; bottom: -20%; right: -10%; width: 60%; height: 60%;
-            background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); z-index: -1;
-        }
 
         .glass-container {
-            max-width: 1200px; margin: 0 auto;
+            max-width: 1400px; margin: 0 auto;
             background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border); border-top: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
-        /* Modern Table */
-        .table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); }
-        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
-        th, td { padding: 15px 20px; text-align: left; }
+        .header-box { display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 0.95rem; }
+        th, td { padding: 12px 15px; text-align: left; }
         th { background: rgba(255,255,255,0.05); color: var(--gold); font-weight: 500; border-bottom: 1px solid var(--glass-border); }
         td { border-bottom: 1px solid rgba(255,255,255,0.03); transition: 0.2s; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.05); }
 
-        /* Action Buttons */
-        button {
-            font-family: 'Prompt', sans-serif; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: inline-flex; align-items: center; gap: 5px;
+        button, .btn-link {
+            font-family: 'Prompt', sans-serif; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem;
+            cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
         }
-        .btn-approve { 
-            background: rgba(74, 222, 128, 0.15); color: #4ADE80; border: 1px solid rgba(74, 222, 128, 0.3); margin-right: 5px;
-        }
-        .btn-approve:hover { background: #4ADE80; color: #000; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(74, 222, 128, 0.3); }
+        .btn-approve { background: rgba(74, 222, 128, 0.15); color: #4ADE80; border: 1px solid rgba(74, 222, 128, 0.3); margin-right: 5px; }
+        .btn-approve:hover { background: #4ADE80; color: #000; }
         
-        .btn-cancel { 
-            background: rgba(248, 113, 113, 0.1); color: #F87171; border: 1px solid rgba(248, 113, 113, 0.2);
-        }
-        .btn-cancel:hover { background: #F87171; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(248, 113, 113, 0.3); }
+        .btn-cancel { background: rgba(248, 113, 113, 0.1); color: #F87171; border: 1px solid rgba(248, 113, 113, 0.2); }
+        .btn-cancel:hover { background: #F87171; color: #fff; }
 
-        .status-badge {
-            padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; display: inline-block;
-        }
+        .btn-slip { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .btn-slip:hover { background: #38BDF8; color: #000; }
+
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; display: inline-block; }
         .status-pending { background: rgba(251, 191, 36, 0.15); color: #FBBF24; border: 1px solid rgba(251, 191, 36, 0.3); }
         .status-confirmed { background: rgba(74, 222, 128, 0.15); color: #4ADE80; border: 1px solid rgba(74, 222, 128, 0.3); }
     </style>
 </head>
 <body>
     <div class="glass-container">
-        <h2 style="color: var(--gold); margin-top:0; display:flex; justify-content:space-between; align-items:center;">
-            ระบบหลังบ้าน - จัดการการจองโต๊ะ
-            <button onclick="loadAdminData()" style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2);">🔄 รีเฟรชข้อมูล</button>
-        </h2>
+        <div class="header-box">
+            <h2 style="color: var(--gold); margin:0;">ระบบหลังบ้าน</h2>
+            <button onclick="loadAdminData()" style="background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); font-size:1rem; padding: 8px 15px;">🔄 รีเฟรชข้อมูล</button>
+        </div>
         
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th>โต๊ะ</th><th>สถานะ</th><th>ชื่อผู้จอง</th><th>รุ่น</th><th>เบอร์โทร</th><th>เลขอ้างอิง</th><th>จัดการ</th>
+                        <th>โต๊ะ</th><th>สถานะ</th><th>ผู้จอง</th><th>รุ่น</th><th>เบอร์โทร</th>
+                        <th>วันที่โอน</th><th>เวลาโอน</th><th>สลิป</th><th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody id="admin-table">
-                    <tr><td colspan="7" style="text-align:center; padding: 40px; color:rgba(255,255,255,0.5);">กำลังโหลดข้อมูลจากฐานข้อมูล... ⏳</td></tr>
+                    <tr><td colspan="9" style="text-align:center; padding: 40px; color:rgba(255,255,255,0.5);">กำลังโหลดข้อมูล... ⏳</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
+        // *** เปลี่ยน URL นี้ให้เป็นของที่คุณ Deploy ใหม่ ***
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9JKyiqStSo6ncEmYKjSrVwzgIjc2ZvRJi_b_huBKsDqXlHYeFqvKqULpfvLgqfPspxA/exec';
+
+        // ฟังก์ชันจัดฟอร์แมตวันที่ให้สวยงาม
+        function formatDate(dateString) {
+            if(!dateString) return '-';
+            // ถ้าเป็น format จาก type="date" เช่น 2024-03-25
+            if(dateString.includes('-')) {
+                const parts = dateString.split('T')[0].split('-');
+                if(parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+            return dateString;
+        }
 
         async function loadAdminData() {
             const tbody = document.getElementById('admin-table');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:rgba(255,255,255,0.5);">กำลังโหลดข้อมูล... ⏳</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px; color:rgba(255,255,255,0.5);">กำลังโหลดข้อมูล... ⏳</td></tr>';
             
             try {
                 const res = await fetch(SCRIPT_URL, { redirect: "follow" });
@@ -107,6 +110,10 @@
                             ? '<span class="status-badge status-pending">🟡 รอตรวจสอบ</span>'
                             : '<span class="status-badge status-confirmed">🟢 ยืนยันแล้ว</span>';
                             
+                        let slipHtml = t.Slip_URL 
+                            ? `<a href="${t.Slip_URL}" target="_blank" class="btn-link btn-slip">📄 ดูสลิป</a>` 
+                            : '<span style="color:#94A3B8;">ไม่มีไฟล์</span>';
+                            
                         tbody.innerHTML += `
                             <tr>
                                 <td style="font-weight:500; color:white;">${t.Table_ID}</td>
@@ -114,10 +121,12 @@
                                 <td>${t.Booker_Name}</td>
                                 <td>${t.Alumni_Gen}</td>
                                 <td>${t.Phone}</td>
-                                <td style="color:#94A3B8;">${t.Ref_Code || '-'}</td>
+                                <td>${formatDate(t.Transfer_Date)}</td>
+                                <td>${t.Transfer_Time || '-'}</td>
+                                <td>${slipHtml}</td>
                                 <td>
                                     ${t.Status === 'รอตรวจสอบ' ? `<button class="btn-approve" onclick="updateStatus('${t.Table_ID}', 'approve')">✔ ยืนยัน</button>` : ''}
-                                    <button class="btn-cancel" onclick="updateStatus('${t.Table_ID}', 'cancel')">✖ ยกเลิก/ลบ</button>
+                                    <button class="btn-cancel" onclick="updateStatus('${t.Table_ID}', 'cancel')">✖ ยกเลิก</button>
                                 </td>
                             </tr>
                         `;
@@ -125,15 +134,15 @@
                 });
 
                 if(count === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:rgba(255,255,255,0.3);">ยังไม่มีข้อมูลการจองโต๊ะในขณะนี้</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px; color:rgba(255,255,255,0.3);">ยังไม่มีข้อมูลการจองโต๊ะในขณะนี้</td></tr>';
                 }
             } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:#F87171;">เกิดข้อผิดพลาดในการโหลดข้อมูล โปรดตรวจสอบ Google Apps Script</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px; color:#F87171;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
             }
         }
 
         async function updateStatus(tableId, action) {
-            let msg = action === 'approve' ? `คุณต้องการ "ยืนยัน" การจองโต๊ะ ${tableId} ใช่หรือไม่?` : `คุณต้องการ "ยกเลิก/ลบ" โต๊ะ ${tableId} ใช่หรือไม่?\n(โต๊ะนี้จะกลับไปเป็นสถานะ ว่าง)`;
+            let msg = action === 'approve' ? `คุณต้องการ "ยืนยัน" การจองโต๊ะ ${tableId} ใช่หรือไม่?` : `คุณต้องการ "ยกเลิก/ลบ" โต๊ะ ${tableId} ใช่หรือไม่?`;
             
             if(confirm(msg)) {
                 try {
@@ -141,7 +150,7 @@
                         method: 'POST',
                         body: JSON.stringify({ action: action, Table_ID: tableId })
                     });
-                    loadAdminData(); // โหลดข้อมูลใหม่ทันที
+                    loadAdminData(); 
                 } catch(e) {
                     alert('เกิดข้อผิดพลาดในการอัปเดตข้อมูล');
                 }
