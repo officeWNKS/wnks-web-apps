@@ -31,7 +31,7 @@
         }
 
         .glass-container {
-            max-width: 1000px; margin: 10px auto; padding: 30px 20px;
+            max-width: 1200px; margin: 10px auto; padding: 30px 20px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
@@ -47,45 +47,69 @@
             background: linear-gradient(90deg, #FDE68A, #D4AF37);
             -webkit-background-clip: text; background-clip: text;
             margin-top: 0; text-shadow: 0 4px 20px rgba(212,175,55,0.3);
-            font-size: clamp(1.5rem, 5vw, 2.5rem); /* Responsive Font */
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
         }
 
         .status-legend { display:flex; justify-content:center; flex-wrap: wrap; gap:15px; margin-bottom:30px; font-weight: 300; font-size: 0.9rem;}
         .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 10px currentColor;}
 
+        /* Modernized Table Grid */
         .table-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* ขยายขนาดเพื่อให้พอดีกับข้อความ */
             gap: 15px;
+            justify-items: center;
+        }
+
+        /* Table Card (คลุมโต๊ะและชื่อผู้จอง) */
+        .table-card {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 15px 10px; width: 100%; box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px; border: 1px solid transparent;
+            transition: 0.3s ease;
+        }
+        .table-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
         }
         
         .table-btn {
-            padding: 0; aspect-ratio: 1/1; border-radius: 50%;
+            width: 65px; height: 65px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1rem; font-weight: 500; cursor: pointer;
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            font-size: 1.1rem; font-weight: 500; cursor: pointer;
+            background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative; overflow: hidden;
             box-shadow: inset 0 0 20px rgba(255,255,255,0.02), 0 4px 15px rgba(0,0,0,0.2);
         }
-        
-        .table-btn::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
-            transform: skewX(-25deg); transition: 0.5s; z-index: 1;
-        }
-        .table-btn:hover:not(.รอตรวจสอบ):not(.ยืนยันแล้ว)::before { left: 150%; }
 
-        .table-btn.ว่าง { color: #4ADE80; border-color: rgba(74, 222, 128, 0.3); }
+        /* States สำหรับปุ่มโต๊ะ */
+        .table-btn.ว่าง { color: #4ADE80; border-color: rgba(74, 222, 128, 0.5); }
         .table-btn.ว่าง:hover { 
-            transform: translateY(-5px) scale(1.1); 
+            transform: scale(1.1); 
             background: rgba(74, 222, 128, 0.15); 
             box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3), inset 0 0 15px rgba(74, 222, 128, 0.2);
-            border-color: #4ADE80;
         }
-        .table-btn.รอตรวจสอบ { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); cursor: not-allowed; }
-        .table-btn.ยืนยันแล้ว { color: #64748B; border-color: rgba(100, 116, 139, 0.2); background: rgba(0,0,0,0.2); cursor: not-allowed; }
+        .table-btn.รอตรวจสอบ { color: var(--gold); border-color: rgba(251, 191, 36, 0.5); cursor: not-allowed; }
+        .table-btn.ยืนยันแล้ว { color: #64748B; border-color: rgba(100, 116, 139, 0.4); background: rgba(0,0,0,0.4); cursor: not-allowed; }
 
+        /* ส่วนแสดงข้อความใต้โต๊ะ */
+        .table-info { text-align: center; width: 100%; }
+        .info-status { font-size: 0.75rem; font-weight: 500; margin-bottom: 3px; }
+        .info-status.ว่าง { color: #4ADE80; }
+        .info-status.รอตรวจสอบ { color: var(--gold); }
+        .info-status.ยืนยันแล้ว { color: #94A3B8; }
+        
+        .info-booker { 
+            font-size: 0.8rem; color: rgba(255,255,255,0.8);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            width: 100%; max-width: 90px; margin: 0 auto;
+        }
+
+        /* Modal Styles (เหมือนเดิม) */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);
@@ -105,9 +129,7 @@
         }
         .modal.active .modal-content { transform: translateY(0) scale(1); }
 
-        .input-group {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-        }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         input, .file-upload-label {
             width: 100%; padding: 12px 15px; margin: 8px 0; border-radius: 12px;
@@ -120,11 +142,9 @@
             outline: none; background: rgba(0, 0, 0, 0.4);
             border-color: var(--gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
         }
-        /* เปลี่ยนไอคอน Date/Time เป็นสีขาว */
         input[type="date"]::-webkit-calendar-picker-indicator,
         input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
-        /* File Upload UI */
         input[type="file"] { display: none; }
         .file-upload-label {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -157,7 +177,7 @@
         <div class="status-legend">
             <span style="color:#4ADE80;"><i class="status-dot" style="background:#4ADE80;"></i> ว่าง</span>
             <span style="color:var(--gold);"><i class="status-dot" style="background:var(--gold);"></i> รอตรวจสอบ</span>
-            <span style="color:#64748B;"><i class="status-dot" style="background:#64748B;"></i> จองแล้ว</span>
+            <span style="color:#94A3B8;"><i class="status-dot" style="background:#64748B;"></i> จองแล้ว</span>
         </div>
         
         <div class="table-grid" id="grid">
@@ -165,6 +185,7 @@
         </div>
     </div>
 
+    <!-- Modal จองโต๊ะ -->
     <div class="modal" id="bookModal">
         <div class="modal-content">
             <h2 style="color: var(--gold); margin-top:0; margin-bottom:15px; font-weight: 500; text-align:center;">จองโต๊ะ <span id="selectedTable"></span></h2>
@@ -191,10 +212,10 @@
     </div>
 
     <script>
+        // *** วาง URL ของคุณตรงนี้ ***
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzl5Av1q49qTxa_qC_x4jY6Fjpwz95nHow8RqDY8nfbLIXkVInhJbfyULxXheNHUbyTAA/exec';
         let currentTable = '';
 
-        // แสดงชื่อไฟล์เมื่อเลือกไฟล์
         document.getElementById('slip').addEventListener('change', function(e) {
             const fileName = e.target.files[0] ? e.target.files[0].name : "ยังไม่ได้เลือกไฟล์";
             document.getElementById('fileName').innerText = fileName;
@@ -208,13 +229,40 @@
                 grid.innerHTML = '';
                 
                 tables.forEach(t => {
+                    // สร้าง Card ครอบโต๊ะ
+                    const card = document.createElement('div');
+                    card.className = 'table-card';
+
+                    // วงกลมปุ่มโต๊ะ
                     const btn = document.createElement('div');
                     btn.className = `table-btn ${t.Status}`;
                     btn.innerText = t.Table_ID;
                     if(t.Status === 'ว่าง') {
                         btn.onclick = () => openModal(t.Table_ID);
+                        btn.title = "คลิกเพื่อจองโต๊ะนี้";
                     }
-                    grid.appendChild(btn);
+
+                    // ข้อมูลใต้โต๊ะ
+                    const info = document.createElement('div');
+                    info.className = 'table-info';
+                    
+                    const statusText = document.createElement('div');
+                    statusText.className = `info-status ${t.Status}`;
+                    statusText.innerText = t.Status;
+
+                    const bookerText = document.createElement('div');
+                    bookerText.className = 'info-booker';
+                    // ตรวจสอบถ้ามีคนจองแล้วให้แสดงชื่อ ถ้าว่างให้แสดง -
+                    let displayName = (t.Status !== 'ว่าง' && t.Booker_Name) ? t.Booker_Name : '-';
+                    bookerText.innerText = displayName;
+                    bookerText.title = displayName; // ให้ชี้เมาส์เพื่อดูชื่อเต็มได้ถ้าชื่อยาวเกินไป
+
+                    info.appendChild(statusText);
+                    info.appendChild(bookerText);
+
+                    card.appendChild(btn);
+                    card.appendChild(info);
+                    grid.appendChild(card);
                 });
             } catch (error) {
                 document.getElementById('grid').innerHTML = '<div id="loading" style="color:#F87171;">เชื่อมต่อล้มเหลว โปรดรีเฟรช</div>';
@@ -226,7 +274,6 @@
             document.getElementById('selectedTable').innerText = tableId;
             document.getElementById('bookModal').classList.add('active');
             
-            // เคลียร์ค่าฟอร์ม
             document.getElementById('name').value = '';
             document.getElementById('gen').value = '';
             document.getElementById('phone').value = '';
@@ -238,7 +285,6 @@
         
         function closeModal() { document.getElementById('bookModal').classList.remove('active'); }
 
-        // ฟังก์ชันแปลงรูปภาพเป็น Base64
         function getBase64(file) {
            return new Promise((resolve, reject) => {
              const reader = new FileReader();
@@ -260,10 +306,9 @@
                 alert("กรุณากรอกข้อมูลและแนบสลิปให้ครบถ้วน"); return;
             }
 
-            // เช็คขนาดไฟล์ (จำกัดไม่เกิน 5MB ป้องกันระบบค้าง)
             const file = fileInput.files[0];
             if(file.size > 5 * 1024 * 1024) {
-                alert("ขนาดไฟล์สลิปใหญ่เกินไป (จำกัด 5MB) กรุณาครอปภาพ หรือลดขนาดภาพก่อนอัปโหลด");
+                alert("ขนาดไฟล์สลิปใหญ่เกินไป (จำกัด 5MB) กรุณาลดขนาดภาพก่อนอัปโหลด");
                 return;
             }
 
@@ -283,7 +328,6 @@
                     Slip_Base64: base64Data, Slip_Name: finalFileName
                 };
                 
-                // ตั้งค่า headers เป็น text/plain เพื่อเลี่ยงการโดนบล็อก CORS จากเบราว์เซอร์
                 const response = await fetch(SCRIPT_URL, { 
                     method: 'POST', 
                     body: JSON.stringify(data),
@@ -299,7 +343,6 @@
                     alert('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ' + result.message);
                 }
             } catch(e) {
-                // กรณีเน็ตหลุด หรือเกิด CORS Policy ตอนตอบกลับ แต่ข้อมูลมักจะเข้าชีตไปแล้ว
                 alert('ส่งข้อมูลสำเร็จแต่อาจใช้เวลาประมวลผลรูปภาพ กรุณารีเฟรชหน้าเว็บเพื่อตรวจสอบสถานะ');
                 closeModal(); loadTables();
                 console.error(e);
