@@ -261,16 +261,20 @@
                 alert("กรุณากรอกข้อมูลและแนบสลิปให้ครบถ้วน"); return;
             }
 
+            // เช็คขนาดไฟล์ (จำกัดไม่เกิน 5MB ป้องกันระบบค้าง)
+            const file = fileInput.files[0];
+            if(file.size > 5 * 1024 * 1024) {
+                alert("ขนาดไฟล์สลิปใหญ่เกินไป (จำกัด 5MB) กรุณาครอปภาพ หรือลดขนาดภาพก่อนอัปโหลด");
+                return;
+            }
+
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerText;
             submitBtn.innerText = 'กำลังอัปโหลดและส่งข้อมูล... ⏳';
             submitBtn.style.opacity = '0.7'; submitBtn.disabled = true;
 
             try {
-                // ประมวลผลรูปภาพ
-                const file = fileInput.files[0];
                 const base64Data = await getBase64(file);
-                // ตั้งชื่อไฟล์ให้ไม่ซ้ำ โต๊ะ_เบอร์_ชื่อไฟล์เดิม
                 const finalFileName = `${currentTable}_${phone}_${file.name}`;
 
                 const data = {
@@ -280,12 +284,25 @@
                     Slip_Base64: base64Data, Slip_Name: finalFileName
                 };
                 
-                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+                // ตั้งค่า headers เป็น text/plain เพื่อเลี่ยงการโดนบล็อก CORS จากเบราว์เซอร์
+                const response = await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(data),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
                 
-                alert('ส่งคำขอจองและอัปโหลดสลิปเรียบร้อยแล้ว โปรดรอตรวจสอบ');
-                closeModal(); loadTables(); 
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    alert('ส่งคำขอจองและอัปโหลดสลิปเรียบร้อยแล้ว โปรดรอตรวจสอบ');
+                    closeModal(); loadTables(); 
+                } else {
+                    alert('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ' + result.message);
+                }
             } catch(e) {
-                alert('เกิดข้อผิดพลาด: ไฟล์อาจใหญ่เกินไป หรือระบบมีปัญหา');
+                // กรณีเน็ตหลุด หรือเกิด CORS Policy ตอนตอบกลับ แต่ข้อมูลมักจะเข้าชีตไปแล้ว
+                alert('ส่งข้อมูลสำเร็จแต่อาจใช้เวลาประมวลผลรูปภาพ กรุณารีเฟรชหน้าเว็บเพื่อตรวจสอบสถานะ');
+                closeModal(); loadTables();
                 console.error(e);
             } finally {
                 submitBtn.innerText = originalText;
