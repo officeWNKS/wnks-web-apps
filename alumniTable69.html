@@ -7,16 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy: #0F172A;
-            --blue: #38BDF8;
-            --gold: #FBBF24;
+            --navy: #0F172A; --blue: #38BDF8; --gold: #FBBF24;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
         body {
-            margin: 0; padding: 20px; font-family: 'Prompt', sans-serif;
-            background-color: var(--navy);
-            color: white; min-height: 100vh;
+            margin: 0; padding: 15px; font-family: 'Prompt', sans-serif;
+            background-color: var(--navy); color: white; min-height: 100vh;
             overflow-x: hidden; position: relative;
         }
 
@@ -33,9 +30,8 @@
             100% { transform: translate(50px, 50px) scale(1.2); }
         }
 
-        /* Liquid Glass Container */
         .glass-container {
-            max-width: 1000px; margin: 20px auto; padding: 40px 30px;
+            max-width: 1000px; margin: 10px auto; padding: 30px 20px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
@@ -45,37 +41,34 @@
             box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
+        
         h1 { 
             color: transparent; 
             background: linear-gradient(90deg, #FDE68A, #D4AF37);
             -webkit-background-clip: text; background-clip: text;
             margin-top: 0; text-shadow: 0 4px 20px rgba(212,175,55,0.3);
+            font-size: clamp(1.5rem, 5vw, 2.5rem); /* Responsive Font */
         }
 
-        /* Status Indicator */
-        .status-legend { display:flex; justify-content:center; gap:25px; margin-bottom:30px; font-weight: 300; }
-        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px currentColor;}
+        .status-legend { display:flex; justify-content:center; flex-wrap: wrap; gap:15px; margin-bottom:30px; font-weight: 300; font-size: 0.9rem;}
+        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 10px currentColor;}
 
-        /* Modern Table Grid */
         .table-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
-            gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 15px;
         }
         
-        /* Table Button Liquid Hover */
         .table-btn {
             padding: 0; aspect-ratio: 1/1; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; font-weight: 500; cursor: pointer;
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(10px);
+            font-size: 1rem; font-weight: 500; cursor: pointer;
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative; overflow: hidden;
             box-shadow: inset 0 0 20px rgba(255,255,255,0.02), 0 4px 15px rgba(0,0,0,0.2);
         }
         
-        /* Shine effect */
         .table-btn::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
@@ -83,7 +76,6 @@
         }
         .table-btn:hover:not(.รอตรวจสอบ):not(.ยืนยันแล้ว)::before { left: 150%; }
 
-        /* States */
         .table-btn.ว่าง { color: #4ADE80; border-color: rgba(74, 222, 128, 0.3); }
         .table-btn.ว่าง:hover { 
             transform: translateY(-5px) scale(1.1); 
@@ -91,49 +83,63 @@
             box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3), inset 0 0 15px rgba(74, 222, 128, 0.2);
             border-color: #4ADE80;
         }
-
         .table-btn.รอตรวจสอบ { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); cursor: not-allowed; }
         .table-btn.ยืนยันแล้ว { color: #64748B; border-color: rgba(100, 116, 139, 0.2); background: rgba(0,0,0,0.2); cursor: not-allowed; }
 
-        /* Glass Modal */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center; z-index: 100;
             opacity: 0; visibility: hidden; transition: 0.4s ease;
+            padding: 15px; box-sizing: border-box;
         }
         .modal.active { opacity: 1; visibility: visible; }
         
         .modal-content {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30, 41, 59, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.15); border-top: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 40px; border-radius: 24px; width: 90%; max-width: 350px;
+            padding: 30px; border-radius: 24px; width: 100%; max-width: 400px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             transform: translateY(50px) scale(0.9); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
         }
         .modal.active .modal-content { transform: translateY(0) scale(1); }
 
-        /* Modern Inputs */
-        input {
-            width: 100%; padding: 12px 15px; margin: 10px 0 15px; border-radius: 12px;
+        .input-group {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+
+        input, .file-upload-label {
+            width: 100%; padding: 12px 15px; margin: 8px 0; border-radius: 12px;
             background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1);
             color: white; font-family: 'Prompt', sans-serif; box-sizing: border-box;
-            transition: 0.3s;
+            transition: 0.3s; font-size: 0.95rem;
         }
         input::placeholder { color: rgba(255,255,255,0.4); }
         input:focus {
             outline: none; background: rgba(0, 0, 0, 0.4);
             border-color: var(--gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
         }
+        /* เปลี่ยนไอคอน Date/Time เป็นสีขาว */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
-        /* Buttons */
+        /* File Upload UI */
+        input[type="file"] { display: none; }
+        .file-upload-label {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1px dashed rgba(255,255,255,0.3); cursor: pointer; text-align: center;
+            background: rgba(255, 255, 255, 0.05); padding: 20px 10px;
+        }
+        .file-upload-label:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--gold); }
+        .file-name { font-size: 0.85rem; color: var(--gold); margin-top: 5px; word-break: break-all; }
+
         .btn {
             width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 500; font-family: 'Prompt', sans-serif;
-            cursor: pointer; transition: 0.3s; margin-top: 10px; position: relative; overflow: hidden;
+            cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 1rem;
         }
         .btn-submit { background: linear-gradient(135deg, #F59E0B, #D97706); color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
         .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5); }
-        
         .btn-cancel { background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255,255,255,0.1); }
         .btn-cancel:hover { background: rgba(255, 255, 255, 0.1); }
         
@@ -141,13 +147,12 @@
     </style>
 </head>
 <body>
-    <!-- Background Blobs -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
     <div class="glass-container">
         <h1>50 ปี โรงเรียนวังน้ำคู้ศึกษา</h1>
-        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px;">แผนผังจองโต๊ะจีน (1 โต๊ะ = 8 ที่นั่ง)</p>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px; font-size:0.95rem;">แผนผังจองโต๊ะจีน (1 โต๊ะ = 8 ที่นั่ง)</p>
         
         <div class="status-legend">
             <span style="color:#4ADE80;"><i class="status-dot" style="background:#4ADE80;"></i> ว่าง</span>
@@ -156,18 +161,29 @@
         </div>
         
         <div class="table-grid" id="grid">
-            <div id="loading">กำลังซิงค์ข้อมูลจากฐานข้อมูล... ⏳</div>
+            <div id="loading">กำลังซิงค์ข้อมูล... ⏳</div>
         </div>
     </div>
 
-    <!-- Animated Modal -->
     <div class="modal" id="bookModal">
         <div class="modal-content">
-            <h2 style="color: var(--gold); margin-top:0; font-weight: 500;">จองโต๊ะ <span id="selectedTable"></span></h2>
+            <h2 style="color: var(--gold); margin-top:0; margin-bottom:15px; font-weight: 500; text-align:center;">จองโต๊ะ <span id="selectedTable"></span></h2>
+            
             <input type="text" id="name" placeholder="ชื่อ-นามสกุล (ผู้จอง)" required autocomplete="off">
             <input type="text" id="gen" placeholder="ศิษย์เก่ารุ่นที่" required autocomplete="off">
             <input type="tel" id="phone" placeholder="เบอร์โทรศัพท์" required autocomplete="off">
-            <input type="text" id="ref" placeholder="เลขอ้างอิงสลิปโอนเงิน (ถ้ามี)" autocomplete="off">
+            
+            <div class="input-group">
+                <input type="date" id="t_date" required title="วันที่โอนเงิน">
+                <input type="time" id="t_time" required title="เวลาที่โอนเงิน">
+            </div>
+
+            <label class="file-upload-label" for="slip">
+                <div style="font-size:1.5rem;">📸</div>
+                <div style="font-size:0.9rem; margin-top:5px;">คลิกเพื่ออัปโหลดสลิปการโอนเงิน</div>
+                <div class="file-name" id="fileName">ยังไม่ได้เลือกไฟล์ (รับเฉพาะรูปภาพ)</div>
+            </label>
+            <input type="file" id="slip" accept="image/*" required>
             
             <button class="btn btn-submit" id="submitBtn" onclick="submitBooking()">ยืนยันการจอง</button>
             <button class="btn btn-cancel" onclick="closeModal()">ยกเลิก</button>
@@ -175,8 +191,15 @@
     </div>
 
     <script>
+        // *** เปลี่ยน URL นี้ให้เป็นของที่คุณ Deploy ใหม่ ***
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9JKyiqStSo6ncEmYKjSrVwzgIjc2ZvRJi_b_huBKsDqXlHYeFqvKqULpfvLgqfPspxA/exec';
         let currentTable = '';
+
+        // แสดงชื่อไฟล์เมื่อเลือกไฟล์
+        document.getElementById('slip').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : "ยังไม่ได้เลือกไฟล์";
+            document.getElementById('fileName').innerText = fileName;
+        });
 
         async function loadTables() {
             try {
@@ -195,60 +218,78 @@
                     grid.appendChild(btn);
                 });
             } catch (error) {
-                document.getElementById('grid').innerHTML = '<div id="loading" style="color:#F87171;">ไม่สามารถเชื่อมต่อฐานข้อมูลได้ โปรดลองรีเฟรชหน้าเว็บใหม่</div>';
+                document.getElementById('grid').innerHTML = '<div id="loading" style="color:#F87171;">เชื่อมต่อล้มเหลว โปรดรีเฟรช</div>';
             }
         }
 
         function openModal(tableId) {
             currentTable = tableId;
             document.getElementById('selectedTable').innerText = tableId;
-            document.getElementById('bookModal').classList.add('active'); // ใช้ Class เพื่อ Animate
+            document.getElementById('bookModal').classList.add('active');
             
             // เคลียร์ค่าฟอร์ม
             document.getElementById('name').value = '';
             document.getElementById('gen').value = '';
             document.getElementById('phone').value = '';
-            document.getElementById('ref').value = '';
+            document.getElementById('t_date').value = '';
+            document.getElementById('t_time').value = '';
+            document.getElementById('slip').value = '';
+            document.getElementById('fileName').innerText = 'ยังไม่ได้เลือกไฟล์ (รับเฉพาะรูปภาพ)';
         }
         
-        function closeModal() { 
-            document.getElementById('bookModal').classList.remove('active'); 
+        function closeModal() { document.getElementById('bookModal').classList.remove('active'); }
+
+        // ฟังก์ชันแปลงรูปภาพเป็น Base64
+        function getBase64(file) {
+           return new Promise((resolve, reject) => {
+             const reader = new FileReader();
+             reader.readAsDataURL(file);
+             reader.onload = () => resolve(reader.result);
+             reader.onerror = error => reject(error);
+           });
         }
 
         async function submitBooking() {
-            // เช็คช่องว่าง
-            if(!document.getElementById('name').value || !document.getElementById('gen').value || !document.getElementById('phone').value) {
-                alert("กรุณากรอกข้อมูลให้ครบถ้วน"); return;
+            const name = document.getElementById('name').value;
+            const gen = document.getElementById('gen').value;
+            const phone = document.getElementById('phone').value;
+            const tDate = document.getElementById('t_date').value;
+            const tTime = document.getElementById('t_time').value;
+            const fileInput = document.getElementById('slip');
+
+            if(!name || !gen || !phone || !tDate || !tTime || fileInput.files.length === 0) {
+                alert("กรุณากรอกข้อมูลและแนบสลิปให้ครบถ้วน"); return;
             }
 
-            const data = {
-                action: 'book', Table_ID: currentTable,
-                Booker_Name: document.getElementById('name').value,
-                Alumni_Gen: document.getElementById('gen').value,
-                Phone: document.getElementById('phone').value,
-                Ref_Code: document.getElementById('ref').value
-            };
-            
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'กำลังส่งข้อมูล... ⏳';
-            submitBtn.style.opacity = '0.7';
-            submitBtn.disabled = true;
-            
+            submitBtn.innerText = 'กำลังอัปโหลดและส่งข้อมูล... ⏳';
+            submitBtn.style.opacity = '0.7'; submitBtn.disabled = true;
+
             try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST', body: JSON.stringify(data)
-                });
+                // ประมวลผลรูปภาพ
+                const file = fileInput.files[0];
+                const base64Data = await getBase64(file);
+                // ตั้งชื่อไฟล์ให้ไม่ซ้ำ โต๊ะ_เบอร์_ชื่อไฟล์เดิม
+                const finalFileName = `${currentTable}_${phone}_${file.name}`;
+
+                const data = {
+                    action: 'book', Table_ID: currentTable,
+                    Booker_Name: name, Alumni_Gen: gen, Phone: phone,
+                    Transfer_Date: tDate, Transfer_Time: tTime,
+                    Slip_Base64: base64Data, Slip_Name: finalFileName
+                };
                 
-                alert('ส่งคำขอจองเรียบร้อยแล้ว โปรดรอแอดมินตรวจสอบ');
-                closeModal();
-                loadTables(); 
+                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+                
+                alert('ส่งคำขอจองและอัปโหลดสลิปเรียบร้อยแล้ว โปรดรอตรวจสอบ');
+                closeModal(); loadTables(); 
             } catch(e) {
-                alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
+                alert('เกิดข้อผิดพลาด: ไฟล์อาจใหญ่เกินไป หรือระบบมีปัญหา');
+                console.error(e);
             } finally {
                 submitBtn.innerText = originalText;
-                submitBtn.style.opacity = '1';
-                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1'; submitBtn.disabled = false;
             }
         }
 
