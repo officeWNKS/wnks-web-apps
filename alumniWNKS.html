@@ -322,7 +322,7 @@
   </div>
 
 <script>
-    // ********* ใส่ URL Apps Script อันใหม่ล่าสุดที่นี่ *********
+    // ********* ใส่ URL Apps Script อันใหม่ล่าสุดที่นี่ (หลังจาก Deploy ใหม่) *********
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzr6lNlla9qAKsJafCdJZrTUt9Jz_FGGFyiN2vQfCfCf3XkZcVxB5tbcM3IJY5EbnVRNg/exec";
     // **********************************************************
 
@@ -340,7 +340,7 @@
         toast.className = ''; 
         toast.classList.add('show', type);
         toast.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
-        setTimeout(() => toast.classList.remove('show'), 3500);
+        setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
     function compressImage(file, maxWidth = 600) {
@@ -374,36 +374,40 @@
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
+          // เพิ่ม mode แบบ plain text ให้ส่งผ่านง่ายขึ้น
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
           body: JSON.stringify({ action: "getGenerations" })
         });
         const result = await res.json();
         
         if (result.status === "success") {
           allGenerations = result.data;
-          populateGenDropdown(allGenerations); // อัปเดต Dropdown เลือกดู
-          populateGenSelect(allGenerations);   // อัปเดต Dropdown ในฟอร์มเพิ่มข้อมูล
+          populateGenDropdown(allGenerations); 
+          populateGenSelect(allGenerations);   
           
           if(allGenerations.length > 0) {
              await filterByGen(allGenerations[0]); 
           }
+        } else {
+          // 🚨 ถ้าฝั่งเซิร์ฟเวอร์มี Error จะได้รู้ว่าเกิดอะไรขึ้น
+          showToast("เซิร์ฟเวอร์ขัดข้อง: " + result.message, "error");
+          document.getElementById('mainGenSelect').innerHTML = `<option value="">❌ โหลดข้อมูลล้มเหลว</option>`;
         }
       } catch (err) { 
-          showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error");
+          showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบ URL", "error");
       } finally {
-          // ซ่อน Splash Screen เมื่อโหลดข้อมูลเสร็จ
+          // ซ่อน Splash Screen เสมอไม่ว่าจะสำเร็จหรือพัง
           setTimeout(() => {
               document.getElementById('splash-screen').classList.add('hidden');
           }, 500);
       } 
     }
 
-    // ฟังก์ชันยัดข้อมูลใส่ Dropdown ตรงหน้าจอหลัก
     function populateGenDropdown(genList) {
       const select = document.getElementById('mainGenSelect');
       select.innerHTML = genList.map(g => `<option value="${g}">${g}</option>`).join('');
     }
 
-    // ฟังก์ชันยัดข้อมูลใส่ Dropdown ตรงฟอร์มเพิ่ม
     function populateGenSelect(genList) {
       const select = document.getElementById('formGen');
       select.innerHTML = '<option value="">เลือกรุ่น...</option>' + genList.map(g => `<option value="${g}">${g}</option>`).join('');
@@ -413,7 +417,6 @@
       const q = document.getElementById('searchInput').value.trim();
       if (!q) return showToast("กรุณาพิมพ์คำค้นหา", "error");
       
-      // เมื่อค้นหา ให้แสดงคำว่า "ผลการค้นหา" ใน Dropdown
       const mainSelect = document.getElementById('mainGenSelect');
       if(!mainSelect.querySelector('option[value="search_result"]')){
           mainSelect.innerHTML = `<option value="search_result" selected>--- ผลการค้นหา ---</option>` + mainSelect.innerHTML;
@@ -424,10 +427,16 @@
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: "search", query: q })
         });
         const result = await res.json();
-        renderCards(result.data || []);
+        if(result.status === "success"){
+            renderCards(result.data || []);
+        } else {
+            showToast(result.message, "error");
+            showLoader(false);
+        }
       } catch (err) { 
           showToast("เกิดข้อผิดพลาดในการค้นหา", "error");
           showLoader(false);
@@ -443,7 +452,6 @@
       currentFilterGen = genName;
       document.getElementById('mainGenSelect').value = genName;
       
-      // เอาตัวเลือก 'ผลการค้นหา' ออก (ถ้ามี)
       const searchOpt = document.querySelector('#mainGenSelect option[value="search_result"]');
       if(searchOpt) searchOpt.remove();
 
@@ -456,6 +464,7 @@
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: "getByGen", generation: genName })
         });
         const result = await res.json();
@@ -463,6 +472,9 @@
         if(result.status === "success") {
            cachedData[genName] = result.data;
            renderCards(result.data);
+        } else {
+           showToast(result.message, "error");
+           showLoader(false);
         }
       } catch (err) { 
           showToast(`เกิดข้อผิดพลาดในการดึงข้อมูล`, "error");
@@ -475,7 +487,7 @@
       currentlyDisplayedData = data; 
       
       if (data.length === 0) {
-        container.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลศิษย์เก่า</div>`;
+        container.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลศิษย์เก่าในรุ่นนี้</div>`;
         return;
       }
       
@@ -533,7 +545,11 @@
             }
           };
 
-          const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+          const res = await fetch(SCRIPT_URL, { 
+              method: "POST", 
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify(payload) 
+          });
           const result = await res.json();
           
           if(result.status === 'success') {
@@ -546,17 +562,16 @@
               if(cachedData[gen]) delete cachedData[gen]; // ล้างแคชของรุ่นนี้
               
               if(!allGenerations.includes(gen)) {
-                  // ถ้ารุ่นใหม่เพิ่งถูกสร้าง ให้โชว์จอโหลดแล้วดึงโครงสร้างใหม่
                   document.getElementById('splash-screen').classList.remove('hidden');
                   initApp();
               } else {
                   filterByGen(gen);
               }
           } else {
-               showToast('เกิดข้อผิดพลาด: ' + result.message, "error");
+               showToast('พบบั๊กจากระบบหลังบ้าน: ' + result.message, "error");
           }
       } catch (err) { 
-          showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', "error");
+          showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ ลองใหม่อีกครั้ง', "error");
       } finally {
           submitBtn.innerText = originalBtnText;
           submitBtn.disabled = false;
