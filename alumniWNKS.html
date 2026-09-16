@@ -309,13 +309,15 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzr6lNlla9qAKsJafCdJZrTUt9Jz_FGGFyiN2vQfCfCf3XkZcVxB5tbcM3IJY5EbnVRNg/exec";
     // ****************************************************
 
-    let currentAlumniData = []; // เก็บ State ปัจจุบันเพื่อส่งไปหน้าแก้ไข
+    // 🚀 ตัวแปรเก็บข้อมูลทั้งหมดในหน่วยความจำ
+    let allAlumniData = []; 
+    let allGenerations = [];
+    let currentFilterGen = ""; 
 
     window.onload = () => {
-      fetchGenerations();
+      initApp();
     };
 
-    // --- Utility: Toast Notification ---
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         toast.className = ''; 
@@ -324,7 +326,6 @@
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    // --- Utility: Image Compressor (ป้องการ Error จากไฟล์ภาพขนาดใหญ่) ---
     function compressImage(file, maxWidth = 800) {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -334,43 +335,41 @@
           img.src = event.target.result;
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-            if (width > maxWidth) {
-              height = Math.round((maxWidth / width) * height);
-              width = maxWidth;
-            }
-            canvas.width = width;
-            canvas.height = height;
+            let width = img.width; let height = img.height;
+            if (width > maxWidth) { height = Math.round((maxWidth / width) * height); width = maxWidth; }
+            canvas.width = width; canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', 0.8)); // บีบอัดเป็น JPEG 80%
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); 
           };
         };
       });
     }
 
-    async function fetchGenerations() {
-      showLoader(true);
+    // 🚀 โหลดข้อมูลทุกอย่างแค่ครั้งเดียวตอนเปิดเว็บ
+    async function initApp() {
+      showLoader(true, "กำลังโหลดข้อมูลศิษย์เก่าทั้งหมด...");
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
-          body: JSON.stringify({ action: "getGenerations" })
+          body: JSON.stringify({ action: "getAllData" })
         });
         const result = await res.json();
+        
         if (result.status === "success") {
-          renderGenButtons(result.data);
-          populateGenSelect(result.data);
+          allGenerations = result.data.generations;
+          allAlumniData = result.data.alumni; // เก็บข้อมูลทั้งหมดไว้ใน RAM
           
-          // โหลดข้อมูลทุกรุ่นเป็นค่าเริ่มต้นเพื่อให้เว็บไม่โล่ง
-          if(result.data.length > 0) {
-             filterByGen(result.data[0]); // โหลดรุ่นล่าสุด (หรือปรับเป็น 'ALL' ถ้าต้องการดึงทุกแผ่น)
-          } else {
-             showLoader(false);
+          renderGenButtons(allGenerations);
+          populateGenSelect(allGenerations);
+          
+          if(allGenerations.length > 0) {
+             filterByGen(allGenerations[0]); // แสดงรุ่นแรกทันที
           }
         }
       } catch (err) { 
           showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error");
+      } finally {
           showLoader(false);
       }
     }
@@ -388,62 +387,65 @@
       select.innerHTML = '<option value="">เลือกรุ่น...</option>' + genList.map(g => `<option value="${g}">${g}</option>`).join('');
     }
 
-    async function searchData() {
-      const q = document.getElementById('searchInput').value.trim();
+    // 🚀 ค้นหาจาก Array ในเครื่อง (เร็วแบบ Real-time ไม่ต้องรอโหลด)
+    function searchData() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
       if (!q) return showToast("กรุณาพิมพ์คำค้นหา", "error");
       
       document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
       
-      showLoader(true);
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "search", query: q })
-        });
-        const result = await res.json();
-        renderCards(result.data || []);
-      } catch (err) { 
-          showToast("เกิดข้อผิดพลาดในการค้นหา", "error");
-          showLoader(false);
-      }
+      const results = allAlumniData.filter(item => item.searchString.includes(q));
+      renderCards(results);
     }
+
+    // 🚀 ค้นหาเรียลไทม์ขณะพิมพ์ (พิมพ์ปุ๊บขึ้นปั๊บ)
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+        const q = e.target.value.trim().toLowerCase();
+        if(q.length > 1) { // เริ่มค้นหาเมื่อพิมพ์ 2 ตัวอักษรขึ้นไป
+            document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
+            const results = allAlumniData.filter(item => item.searchString.includes(q));
+            renderCards(results);
+        } else if (q.length === 0 && currentFilterGen) {
+            // ถ้าลบคำค้นหาจนหมด ให้กลับไปแสดงรุ่นที่เลือกไว้ล่าสุด
+            filterByGen(currentFilterGen);
+            // ไฮไลต์ปุ่มรุ่นกลับมา
+            document.querySelectorAll('.gen-btn').forEach(b => {
+                if(b.innerText === currentFilterGen) b.classList.add('active');
+            });
+        }
+    });
 
     document.getElementById('searchInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') searchData();
     });
 
-    async function filterByGen(genName, btn = null) {
+    // 🚀 เปลี่ยนรุ่นดึงจาก Array ในเครื่อง (สลับปุ๊บมาปั๊บ)
+    function filterByGen(genName, btn = null) {
+      currentFilterGen = genName;
       if(btn) {
           document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
       }
 
-      showLoader(true);
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "getByGen", generation: genName })
-        });
-        const result = await res.json();
-        renderCards(result.data || []);
-      } catch (err) { 
-          showToast("เกิดข้อผิดพลาดในการดึงข้อมูล", "error");
-          showLoader(false);
-      }
+      // กรองข้อมูลที่มีอยู่ในตัวแปร allAlumniData
+      const results = allAlumniData.filter(item => item.sheetName === genName);
+      renderCards(results);
     }
+
+    let currentlyDisplayedData = []; // เก็บ State เฉพาะตัวที่กำลังแสดงผลบนจอ
 
     function renderCards(data) {
       const container = document.getElementById('alumniContainer');
-      currentAlumniData = data; // เก็บลง State
+      currentlyDisplayedData = data; 
       
       if (data.length === 0) {
-        container.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลศิษย์เก่าที่ค้นหา</div>`;
+        container.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลศิษย์เก่า</div>`;
         return;
       }
       
       container.innerHTML = data.map((item, index) => `
         <div class="alumni-card">
-          <img src="${item.imageUrl}" class="profile-img" onerror="this.src='https://via.placeholder.com/150/1E3E62/FFFFFF?text=No+Photo'">
+          <img src="${item.imageUrl}" class="profile-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150/1E3E62/FFFFFF?text=No+Photo'">
           <div class="alumni-name">${item.prefix}${item.fname} ${item.lname}</div>
           <div class="alumni-id">รหัส: ${item.studentId}</div>
           
@@ -455,7 +457,6 @@
           <span class="alumni-tag">${item.sheetName}</span>
           
           <div class="card-actions">
-            <!-- ส่ง Index แทน Object เพื่อป้องกันบั๊กเวลาชื่อมี Single Quote -->
             <button class="btn btn-edit" onclick='editItem(${index})'>แก้ไขข้อมูล</button>
           </div>
         </div>
@@ -467,14 +468,13 @@
       
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerText;
-      submitBtn.innerText = 'กำลังบันทึก...';
+      submitBtn.innerText = 'กำลังบันทึกและอัปเดต...';
       submitBtn.disabled = true;
 
       const fileInput = document.getElementById('formImage');
       let base64String = "";
       
       if (fileInput.files.length > 0) {
-        // ใช้ฟังก์ชันบีบอัดรูปภาพก่อนส่ง
         base64String = await compressImage(fileInput.files[0]);
       }
 
@@ -491,7 +491,7 @@
           lineId: document.getElementById('formLineId').value,
           imageBase64: base64String,
           rowIndex: document.getElementById('editRowIndex').value,
-          sheetName: document.getElementById('editSheetName').value
+          sheetName: document.getElementById('editSheetName').value || document.getElementById('formGen').value
         }
       };
 
@@ -502,7 +502,32 @@
         if(result.status === 'success') {
             showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
             closeModal();
-            fetchGenerations(); // โหลดข้อมูลใหม่
+            
+            // 🚀 อัปเดตข้อมูลในหน่วยความจำโดยไม่ต้องโหลดเว็บใหม่ทั้งหมด
+            const savedData = result.data;
+            const existingIndex = allAlumniData.findIndex(item => item.studentId === savedData.studentId && item.sheetName === savedData.sheetName);
+            
+            if (existingIndex > -1) {
+                allAlumniData[existingIndex] = savedData; // อัปเดตข้อมูลเดิม
+            } else {
+                allAlumniData.push(savedData); // เพิ่มข้อมูลใหม่
+                
+                // ถ้ารุ่นที่เพิ่งเพิ่มใหม่ ไม่มีในปุ่ม ให้โหลดใหม่ทั้งหมด
+                if(!allGenerations.includes(savedData.sheetName)) {
+                    initApp();
+                    return;
+                }
+            }
+            
+            // รีเฟรชหน้าจอที่กำลังแสดงอยู่
+            if (currentFilterGen === savedData.sheetName || !currentFilterGen) {
+                filterByGen(savedData.sheetName);
+                document.querySelectorAll('.gen-btn').forEach(b => {
+                    if(b.innerText === savedData.sheetName) b.classList.add('active');
+                    else b.classList.remove('active');
+                });
+            }
+
         } else {
              showToast('เกิดข้อผิดพลาด: ' + result.message, "error");
         }
@@ -515,14 +540,14 @@
     };
 
     function editItem(index) {
-      const item = currentAlumniData[index];
+      const item = currentlyDisplayedData[index];
       document.getElementById('modalTitle').innerText = 'แก้ไขข้อมูลศิษย์เก่า';
       
       document.getElementById('editRowIndex').value = item.rowIndex;
       document.getElementById('editSheetName').value = item.sheetName;
       document.getElementById('formGen').value = item.sheetName;
       document.getElementById('formStudentId').value = item.studentId;
-      document.getElementById('formPrefix').value = item.prefix.trim(); // ลบ space ส่วนเกิน
+      document.getElementById('formPrefix').value = item.prefix.trim();
       document.getElementById('formFname').value = item.fname;
       document.getElementById('formLname').value = item.lname;
       document.getElementById('formNickname').value = item.nickname !== '-' ? item.nickname : '';
@@ -545,6 +570,11 @@
             document.getElementById('formGen').disabled = false;
             document.getElementById('formStudentId').readOnly = false;
             document.getElementById('formStudentId').style.opacity = '1';
+            
+            // ถ้าเลือกดูรุ่นไหนอยู่ ให้ค่าเริ่มต้นการเพิ่มเป็นรุ่นนั้นเลย
+            if(currentFilterGen) {
+                document.getElementById('formGen').value = currentFilterGen;
+            }
         }
     }
     
@@ -555,10 +585,9 @@
         document.getElementById('alumniForm').reset();
         document.getElementById('editRowIndex').value = '';
         document.getElementById('editSheetName').value = '';
-      }, 300); // รอให้ Animation เล่นเสร็จค่อยเคลียร์ค่า
+      }, 300);
     }
 
-    // คลิกพื้นที่ว่างเพื่อปิด Modal
     function closeModalOutside(event) {
         const modalContent = document.getElementById('modalContent');
         if (!modalContent.contains(event.target)) {
@@ -566,17 +595,19 @@
         }
     }
     
-    function showLoader(show) { 
+    function showLoader(show, text="กำลังประมวลผลข้อมูล...") { 
       const container = document.getElementById('alumniContainer');
       const loader = document.getElementById('loader');
+      
       if (show) {
          container.innerHTML = '';
+         loader.querySelector('div:last-child').innerText = text;
          container.appendChild(loader);
          loader.style.display = 'block';
       } else {
          loader.style.display = 'none';
       }
     }
-  </script>
+</script>
 </body>
 </html>
