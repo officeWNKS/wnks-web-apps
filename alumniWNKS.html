@@ -567,14 +567,20 @@ document.getElementById('alumniForm').onsubmit = async (e) => {
               const savedData = result.data;
               const gen = savedData.sheetName;
               
-              if(cachedData[gen]) delete cachedData[gen];
+              // ล้างแคชทั้งหมดเพื่อบังคับโหลดใหม่
+              cachedData = {}; 
               
-              if(!allGenerations.includes(gen)) {
-                  document.getElementById('splash-screen').classList.remove('hidden');
-                  initApp();
-              } else {
-                  filterByGen(gen);
-              }
+              // หน่วงเวลา 1 วินาที ให้ Google Sheet อัปเดตหลังบ้านเสร็จชัวร์ๆ แล้วค่อยโหลดใหม่
+              setTimeout(async () => {
+                  if(!allGenerations.includes(gen)) {
+                      // ถ้ารุ่นใหม่เพิ่งถูกสร้าง ให้โหลด dropdown ใหม่ด้วย
+                      await initApp(); 
+                  } else {
+                      // ถ้ารุ่นเดิม ให้บังคับดึงข้อมูลใหม่
+                      await filterByGen(gen);
+                  }
+              }, 1000); 
+
           } else {
                showToast('พบบั๊กจากระบบหลังบ้าน: ' + result.message, "error");
           }
