@@ -433,41 +433,7 @@
     });
 
     // เพิ่ม Parameter forceRefresh เพื่อบังคับดึงข้อมูลจาก Sheet ใหม่โดยไม่สน Cache
-    async function filterByGen(genName, forceRefresh = false) {
-      if(genName === "search_result") return;
-      currentFilterGen = genName;
-      document.getElementById('mainGenSelect').value = genName;
-      
-      const searchOpt = document.querySelector('#mainGenSelect option[value="search_result"]');
-      if(searchOpt) searchOpt.remove();
-
-      // ถ้าไม่บังคับรีเฟรช และมีข้อมูลใน Cache ให้ใช้ Cache เลย (เร็วขึ้น)
-      if (!forceRefresh && cachedData[genName]) {
-          renderCards(cachedData[genName]);
-          return;
-      }
-
-      showLoader(true, `กำลังโหลดข้อมูล ${genName}...`);
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "getByGen", generation: genName })
-        });
-        const result = await res.json();
-        
-        if(result.status === "success") {
-           cachedData[genName] = result.data; // อัปเดต Cache ใหม่
-           renderCards(result.data);
-        } else {
-           showToast(result.message, "error");
-           showLoader(false);
-        }
-      } catch (err) { 
-          showToast(`เกิดข้อผิดพลาดในการดึงข้อมูล`, "error");
-          showLoader(false);
-      }
-    }
+    async function filterByGen
 
     function renderCards(data) {
       const container = document.getElementById('alumniContainer');
