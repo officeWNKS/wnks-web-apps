@@ -26,7 +26,6 @@
       background: linear-gradient(135deg, var(--bg-navy-dark) 0%, var(--bg-navy-light) 100%);
       color: var(--text-main);
       min-height: 100vh;
-      padding: 30px 20px;
       position: relative;
       overflow-x: hidden;
       display: flex;
@@ -34,26 +33,43 @@
       align-items: center;
     }
 
+    /* --- Splash Screen Animation --- */
+    #splash-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: var(--bg-navy-dark); z-index: 9999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #splash-screen.hidden { opacity: 0; visibility: hidden; }
+    
+    .splash-logo { width: 80px; height: 80px; margin-bottom: 20px; position: relative; }
+    .splash-logo::before, .splash-logo::after {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border-radius: 50%; border: 4px solid transparent;
+    }
+    .splash-logo::before { border-top-color: var(--yellow-gold); border-bottom-color: var(--yellow-gold); animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; }
+    .splash-logo::after { border-left-color: #fff; border-right-color: #fff; animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse; }
+    
+    .splash-text { font-size: 1.5rem; font-weight: 600; color: var(--yellow-gold); letter-spacing: 2px; animation: pulse 1.5s ease-in-out infinite; }
+    .splash-subtext { font-size: 0.9rem; color: var(--text-muted); margin-top: 10px; }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.98); } }
+
     /* Background Blobs */
     .blob { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; pointer-events: none; opacity: 0.5; }
     .blob-1 { width: 400px; height: 400px; background: rgba(255, 215, 0, 0.15); top: -100px; left: -100px; }
     .blob-2 { width: 500px; height: 500px; background: rgba(30, 62, 98, 0.6); bottom: -150px; right: -150px; }
 
-    .container { width: 100%; max-width: 1200px; position: relative; z-index: 1; }
+    .container { width: 100%; max-width: 1200px; padding: 30px 20px; position: relative; z-index: 1; }
 
     header { text-align: center; margin-bottom: 40px; }
     header h1 { font-size: 2.5rem; color: var(--yellow-gold); font-weight: 600; text-shadow: 0 2px 15px rgba(255, 215, 0, 0.2); }
     header p { color: var(--text-muted); font-size: 1.1rem; margin-top: 5px; }
 
     .glass-panel {
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      box-shadow: var(--glass-shadow);
-      padding: 30px;
-      margin-bottom: 30px;
+      background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border);
+      border-radius: 24px; box-shadow: var(--glass-shadow); padding: 30px; margin-bottom: 30px;
     }
     
     .search-box { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
@@ -71,8 +87,7 @@
       background: var(--glass-bg); border: 1px solid var(--glass-border);
       color: var(--text-main); padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-right: 15px; transition: 0.3s;
     }
-    input[type="file"]::file-selector-button:hover { background: rgba(255,255,255,0.2); }
-
+    
     .search-input-wrapper { flex: 1; min-width: 280px; max-width: 500px; display: flex; }
     .search-input-wrapper input { border-radius: 12px 0 0 12px; }
     
@@ -81,23 +96,26 @@
       transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center;
     }
     .btn-gold { background: var(--yellow-gold); color: var(--bg-navy-dark); font-weight: 600; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); }
-    .btn-gold:hover { background: var(--yellow-gold-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4); }
+    .btn-gold:hover { background: var(--yellow-gold-hover); transform: translateY(-2px); }
     .btn-search { border-radius: 0 12px 12px 0; margin-left: -1px; }
-    
     .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); }
     .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--text-main); }
 
+    /* --- New Dropdown Filter (แทนที่ปุ่มรุ่น) --- */
     .filter-section { text-align: center; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
     .filter-label { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; display: block; }
-    .gen-buttons { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; justify-content: center; scrollbar-width: none; }
-    .gen-buttons::-webkit-scrollbar { display: none; }
-    
-    .gen-btn {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
-      color: var(--text-muted); padding: 8px 20px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.3s;
+    .dropdown-wrapper { max-width: 300px; margin: 0 auto; position: relative; }
+    .gen-dropdown {
+      appearance: none; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--yellow-gold);
+      color: var(--yellow-gold); padding: 12px 20px; border-radius: 12px;
+      font-size: 1.05rem; font-weight: 600; cursor: pointer; text-align: center;
+      transition: 0.3s; width: 100%;
     }
-    .gen-btn:hover { background: rgba(255, 255, 255, 0.15); color: var(--text-main); }
-    .gen-btn.active { background: var(--yellow-gold); color: var(--bg-navy-dark); font-weight: 600; }
+    .gen-dropdown:hover { box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+    .dropdown-wrapper::after {
+      content: '▼'; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      color: var(--yellow-gold); pointer-events: none; font-size: 0.8rem;
+    }
 
     .alumni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
     
@@ -129,8 +147,7 @@
     
     .card-actions { margin-top: 20px; }
     .btn-edit { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--glass-border); width: 100%; border-radius: 10px; padding: 10px; }
-    .btn-edit:hover { background: rgba(255, 255, 255, 0.2); }
-
+    
     /* Modal Form */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -146,10 +163,8 @@
     .modal.show .modal-content { transform: translateY(0); }
     .modal-content::-webkit-scrollbar { width: 6px; }
     .modal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-
     .modal-header { margin-bottom: 25px; text-align: center; }
     .modal-header h3 { color: var(--yellow-gold); font-size: 1.5rem; font-weight: 500; }
-    
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); padding-left: 5px; }
     .form-row { display: flex; gap: 15px; }
@@ -157,22 +172,16 @@
     .modal-actions { display: flex; gap: 15px; margin-top: 30px; }
     .modal-actions .btn { flex: 1; padding: 15px; font-size: 1.05rem; }
 
-    /* Loader Spinner */
+    /* Loader Spinner (In-app) */
     .loading-wrapper { display: none; text-align: center; padding: 40px; grid-column: 1/-1; }
-    .spinner {
-      width: 40px; height: 40px; border: 4px solid rgba(255,215,0,0.2);
-      border-top: 4px solid var(--yellow-gold); border-radius: 50%;
-      animation: spin 1s linear infinite; margin: 0 auto 15px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,215,0,0.2); border-top: 4px solid var(--yellow-gold); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
     .empty-state { grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 40px; font-size: 1.1rem; }
 
     /* Toast Notification */
     #toast {
       position: fixed; top: 20px; right: 20px; background: #333; color: #fff; padding: 15px 25px;
       border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000;
-      transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      font-weight: 500; display: flex; align-items: center; gap: 10px;
+      transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-weight: 500; display: flex; align-items: center; gap: 10px;
     }
     #toast.show { transform: translateX(0); }
     #toast.success { background: rgba(46, 204, 113, 0.9); backdrop-filter: blur(5px); }
@@ -189,10 +198,16 @@
   </style>
 </head>
 <body>
+  
+  <!-- Splash Screen (หน้าจอโหลดเข้าเว็บ) -->
+  <div id="splash-screen">
+    <div class="splash-logo"></div>
+    <div class="splash-text">ระบบศิษย์เก่า</div>
+    <div class="splash-subtext">กำลังเตรียมพร้อมฐานข้อมูล...</div>
+  </div>
+
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
-
-  <!-- Toast Notification -->
   <div id="toast"></div>
 
   <div class="container">
@@ -212,8 +227,10 @@
 
       <div class="filter-section">
         <span class="filter-label">เลือกดูตามรุ่น:</span>
-        <div class="gen-buttons" id="genList">
-          <button class="gen-btn active">กำลังโหลดรุ่น...</button>
+        <div class="dropdown-wrapper">
+          <select id="mainGenSelect" class="gen-dropdown" onchange="filterByGen(this.value)">
+            <option value="">กำลังโหลดรายชื่อรุ่น...</option>
+          </select>
         </div>
       </div>
     </div>
@@ -292,7 +309,7 @@
         </div>
         
         <div class="form-group">
-          <label>อัปโหลดรูปภาพโปรไฟล์ (ระบบจะปรับขนาดให้อัตโนมัติ)</label>
+          <label>อัปโหลดรูปภาพโปรไฟล์</label>
           <input type="file" id="formImage" accept="image/*">
         </div>
 
@@ -305,12 +322,11 @@
   </div>
 
 <script>
-    // ********* ใส่ URL Apps Script ของคุณที่นี่ *********
+    // ********* ใส่ URL Apps Script อันใหม่ล่าสุดที่นี่ *********
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzr6lNlla9qAKsJafCdJZrTUt9Jz_FGGFyiN2vQfCfCf3XkZcVxB5tbcM3IJY5EbnVRNg/exec";
-    // ****************************************************
+    // **********************************************************
 
     let allGenerations = [];
-    // สร้างที่เก็บแคช เพื่อให้โหลดรุ่นที่เคยดูแล้วได้ไวขึ้น
     let cachedData = {}; 
     let currentFilterGen = ""; 
     let currentlyDisplayedData = [];
@@ -327,7 +343,6 @@
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    // 🚀 เพิ่มประสิทธิภาพการบีบอัดรูปภาพ (บีบหนักขึ้น รองรับรูประดับ 4K ได้สบาย)
     function compressImage(file, maxWidth = 600) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -339,7 +354,6 @@
             const canvas = document.createElement('canvas');
             let width = img.width; 
             let height = img.height;
-            // บีบให้ความกว้างเหลือแค่ 600px เพื่อลดภาระเซิร์ฟเวอร์
             if (width > maxWidth) { 
                 height = Math.round((maxWidth / width) * height); 
                 width = maxWidth; 
@@ -348,7 +362,6 @@
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            // ลด Quality เหลือ 60% (0.6) ทำให้ไฟล์เหลือแค่ประมาณ 50-100KB
             resolve(canvas.toDataURL('image/jpeg', 0.6)); 
           };
           img.onerror = error => reject(error);
@@ -358,7 +371,6 @@
     }
 
     async function initApp() {
-      showLoader(true, "กำลังโหลดรายชื่อรุ่น...");
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -368,28 +380,30 @@
         
         if (result.status === "success") {
           allGenerations = result.data;
-          renderGenButtons(allGenerations);
-          populateGenSelect(allGenerations);
+          populateGenDropdown(allGenerations); // อัปเดต Dropdown เลือกดู
+          populateGenSelect(allGenerations);   // อัปเดต Dropdown ในฟอร์มเพิ่มข้อมูล
           
           if(allGenerations.length > 0) {
-             // โหลดข้อมูลรุ่นแรกอัตโนมัติ
-             filterByGen(allGenerations[0]); 
+             await filterByGen(allGenerations[0]); 
           }
         }
       } catch (err) { 
           showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error");
-          showLoader(false);
+      } finally {
+          // ซ่อน Splash Screen เมื่อโหลดข้อมูลเสร็จ
+          setTimeout(() => {
+              document.getElementById('splash-screen').classList.add('hidden');
+          }, 500);
       } 
     }
 
-    function renderGenButtons(genList) {
-      const container = document.getElementById('genList');
-      container.innerHTML = '';
-      genList.forEach((gen, index) => {
-        container.innerHTML += `<button class="gen-btn ${index === 0 ? 'active' : ''}" onclick="filterByGen('${gen}', this)">${gen}</button>`;
-      });
+    // ฟังก์ชันยัดข้อมูลใส่ Dropdown ตรงหน้าจอหลัก
+    function populateGenDropdown(genList) {
+      const select = document.getElementById('mainGenSelect');
+      select.innerHTML = genList.map(g => `<option value="${g}">${g}</option>`).join('');
     }
 
+    // ฟังก์ชันยัดข้อมูลใส่ Dropdown ตรงฟอร์มเพิ่ม
     function populateGenSelect(genList) {
       const select = document.getElementById('formGen');
       select.innerHTML = '<option value="">เลือกรุ่น...</option>' + genList.map(g => `<option value="${g}">${g}</option>`).join('');
@@ -399,9 +413,14 @@
       const q = document.getElementById('searchInput').value.trim();
       if (!q) return showToast("กรุณาพิมพ์คำค้นหา", "error");
       
-      document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
-      
-      showLoader(true, "กำลังค้นหาข้อมูลจากทุกรุ่น...");
+      // เมื่อค้นหา ให้แสดงคำว่า "ผลการค้นหา" ใน Dropdown
+      const mainSelect = document.getElementById('mainGenSelect');
+      if(!mainSelect.querySelector('option[value="search_result"]')){
+          mainSelect.innerHTML = `<option value="search_result" selected>--- ผลการค้นหา ---</option>` + mainSelect.innerHTML;
+      }
+      mainSelect.value = "search_result";
+
+      showLoader(true, "กำลังค้นหาข้อมูล...");
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -419,22 +438,20 @@
         if (e.key === 'Enter') searchData();
     });
 
-    // 🚀 ระบบดึงข้อมูลแบบ Smart Cache (จำรุ่นที่เคยเปิดแล้ว)
-    async function filterByGen(genName, btn = null) {
+    async function filterByGen(genName) {
+      if(genName === "search_result") return;
       currentFilterGen = genName;
+      document.getElementById('mainGenSelect').value = genName;
       
-      if(btn) {
-          document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-      }
+      // เอาตัวเลือก 'ผลการค้นหา' ออก (ถ้ามี)
+      const searchOpt = document.querySelector('#mainGenSelect option[value="search_result"]');
+      if(searchOpt) searchOpt.remove();
 
-      // ถ้าเคยโหลดรุ่นนี้มาแล้ว ให้ดึงจากความจำเครื่องเลย (เร็ว 0 วิ)
       if (cachedData[genName]) {
           renderCards(cachedData[genName]);
           return;
       }
 
-      // ถ้ายังไม่เคยโหลด ให้ดึงจาก Google Sheet
       showLoader(true, `กำลังโหลดข้อมูล ${genName}...`);
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -444,11 +461,11 @@
         const result = await res.json();
         
         if(result.status === "success") {
-           cachedData[genName] = result.data; // จำใส่แคชไว้
+           cachedData[genName] = result.data;
            renderCards(result.data);
         }
       } catch (err) { 
-          showToast(`เกิดข้อผิดพลาดในการดึงข้อมูล ${genName}`, "error");
+          showToast(`เกิดข้อผิดพลาดในการดึงข้อมูล`, "error");
           showLoader(false);
       }
     }
@@ -495,7 +512,6 @@
       
       try {
           if (fileInput.files.length > 0) {
-            // บีบอัดรูปก่อนส่ง ป้องกันแอปค้าง
             base64String = await compressImage(fileInput.files[0]);
           }
 
@@ -527,26 +543,20 @@
               const savedData = result.data;
               const gen = savedData.sheetName;
               
-              // ล้างแคชของรุ่นนี้ เพื่อให้ระบบดึงข้อมูลล่าสุดจาก Sheet เมื่อมีการแก้ไข
-              if(cachedData[gen]) {
-                 delete cachedData[gen];
-              }
+              if(cachedData[gen]) delete cachedData[gen]; // ล้างแคชของรุ่นนี้
               
-              // ถ้ารุ่นที่เพิ่งเพิ่มไม่มีในปุ่ม ให้โหลดเว็บใหม่
               if(!allGenerations.includes(gen)) {
+                  // ถ้ารุ่นใหม่เพิ่งถูกสร้าง ให้โชว์จอโหลดแล้วดึงโครงสร้างใหม่
+                  document.getElementById('splash-screen').classList.remove('hidden');
                   initApp();
               } else {
-                  // โหลดข้อมูลรุ่นที่เพิ่งบันทึกมาแสดง
                   filterByGen(gen);
-                  document.querySelectorAll('.gen-btn').forEach(b => {
-                      if(b.innerText === gen) b.classList.add('active');
-                  });
               }
           } else {
                showToast('เกิดข้อผิดพลาด: ' + result.message, "error");
           }
       } catch (err) { 
-          showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ (ขนาดไฟล์อาจยังใหญ่เกินไป)', "error");
+          showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', "error");
       } finally {
           submitBtn.innerText = originalBtnText;
           submitBtn.disabled = false;
