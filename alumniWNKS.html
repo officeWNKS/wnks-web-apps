@@ -3,24 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบฐานข้อมูลศิษย์เก่า - Liquid Glass UI</title>
+  <title>ระบบฐานข้อมูลศิษย์เก่า - วังน้ำคู่ศึกษา</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Color Palette */
       --bg-navy-dark: #0B192C;
       --bg-navy-light: #1E3E62;
       --yellow-gold: #FFD700;
       --yellow-gold-hover: #FFC107;
       --text-main: #FFFFFF;
       --text-muted: rgba(255, 255, 255, 0.7);
-      --danger: #FF6B6B;
-
-      /* Glassmorphism Variables */
-      --glass-bg: rgba(255, 255, 255, 0.1); /* สีพื้นหลังกระจก */
-      --glass-border: rgba(255, 255, 255, 0.2); /* สีขอบกระจก */
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* เงาตกกระทบ */
-      --glass-blur: blur(12px); /* ความเบลอของกระจก */
+      
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      --glass-blur: blur(16px);
     }
 
     * { box-sizing: border-box; font-family: 'Prompt', sans-serif; margin: 0; padding: 0; }
@@ -37,37 +34,17 @@
       align-items: center;
     }
 
-    /* Liquid Decor Backgrounds (Blobs) */
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.6;
-    }
-    .blob-1 { width: 400px; height: 400px; background: rgba(255, 215, 0, 0.15); top: -50px; left: -100px; }
-    .blob-2 { width: 500px; height: 500px; background: rgba(30, 62, 98, 0.5); bottom: -150px; right: -150px; }
-    .blob-3 { width: 300px; height: 300px; background: rgba(255, 215, 0, 0.1); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    /* Background Blobs */
+    .blob { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; pointer-events: none; opacity: 0.5; }
+    .blob-1 { width: 400px; height: 400px; background: rgba(255, 215, 0, 0.15); top: -100px; left: -100px; }
+    .blob-2 { width: 500px; height: 500px; background: rgba(30, 62, 98, 0.6); bottom: -150px; right: -150px; }
 
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      position: relative;
-      z-index: 1; /* ให้อยู่เหนือ Blobs */
-    }
+    .container { width: 100%; max-width: 1200px; position: relative; z-index: 1; }
 
     header { text-align: center; margin-bottom: 40px; }
-    header h1 { 
-      font-size: 2.5rem; 
-      color: var(--yellow-gold); 
-      font-weight: 600; 
-      letter-spacing: 1px;
-      text-shadow: 0 2px 10px rgba(255, 215, 0, 0.2); 
-    }
+    header h1 { font-size: 2.5rem; color: var(--yellow-gold); font-weight: 600; text-shadow: 0 2px 15px rgba(255, 215, 0, 0.2); }
     header p { color: var(--text-muted); font-size: 1.1rem; margin-top: 5px; }
 
-    /* --- Glass UI Core Styles --- */
     .glass-panel {
       background: var(--glass-bg);
       backdrop-filter: var(--glass-blur);
@@ -76,150 +53,63 @@
       border-radius: 24px;
       box-shadow: var(--glass-shadow);
       padding: 30px;
+      margin-bottom: 30px;
     }
-
-    /* Controls Section */
-    .controls-container { margin-bottom: 30px; }
     
-    .search-box {
-      display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;
-    }
+    .search-box { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
 
-    /* Inputs & Selects (Glass Style) */
     input[type="text"], input[type="tel"], select, input[type="file"] {
-      padding: 14px 20px;
-      border-radius: 12px;
-      border: 1px solid var(--glass-border);
-      background: rgba(0, 0, 0, 0.2); /* พื้นหลัง input เข้มขึ้นนิดนึงให้อ่านง่าย */
-      color: var(--text-main);
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s ease;
+      padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.25); color: var(--text-main); font-size: 1rem;
+      outline: none; transition: all 0.3s ease; width: 100%;
     }
     input::placeholder { color: rgba(255, 255, 255, 0.4); }
-    input:focus, select:focus {
-      border-color: var(--yellow-gold);
-      background: rgba(0, 0, 0, 0.3);
-      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
-    }
-    /* สไตล์สำหรับ input file button */
+    input:focus, select:focus { border-color: var(--yellow-gold); background: rgba(0, 0, 0, 0.4); box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15); }
+    select option { background: var(--bg-navy-dark); color: white; }
+
     input[type="file"]::file-selector-button {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-right: 15px;
-      transition: 0.3s;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      color: var(--text-main); padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-right: 15px; transition: 0.3s;
     }
     input[type="file"]::file-selector-button:hover { background: rgba(255,255,255,0.2); }
 
     .search-input-wrapper { flex: 1; min-width: 280px; max-width: 500px; display: flex; }
-    .search-input-wrapper input { width: 100%; border-radius: 12px 0 0 12px; }
+    .search-input-wrapper input { border-radius: 12px 0 0 12px; }
     
-    /* Buttons */
     .btn {
-      padding: 14px 24px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 1rem;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 24px; border-radius: 12px; border: none; cursor: pointer; font-weight: 500; font-size: 1rem;
+      transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center;
     }
-    .btn-gold {
-      background: var(--yellow-gold);
-      color: var(--bg-navy-dark);
-      font-weight: 600;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-    }
-    .btn-gold:hover {
-      background: var(--yellow-gold-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-    }
+    .btn-gold { background: var(--yellow-gold); color: var(--bg-navy-dark); font-weight: 600; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); }
+    .btn-gold:hover { background: var(--yellow-gold-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4); }
     .btn-search { border-radius: 0 12px 12px 0; margin-left: -1px; }
     
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--glass-border);
-      color: var(--text-main);
-    }
-    .btn-outline:hover { background: var(--glass-bg); border-color: var(--text-main); }
+    .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--text-main); }
 
-    /* Generation Filter Buttons */
-    .filter-section {
-      text-align: center;
-      padding-top: 15px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
+    .filter-section { text-align: center; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
     .filter-label { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; display: block; }
-    .gen-buttons {
-      display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; justify-content: center;
-      /* ซ่อน scrollbar แต่ยัง scroll ได้ */
-      -ms-overflow-style: none; scrollbar-width: none;
-    }
+    .gen-buttons { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; justify-content: center; scrollbar-width: none; }
     .gen-buttons::-webkit-scrollbar { display: none; }
     
     .gen-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
-      padding: 8px 20px;
-      border-radius: 20px;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border);
+      color: var(--text-muted); padding: 8px 20px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.3s;
     }
-    .gen-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
-    .gen-btn.active {
-      background: var(--yellow-gold);
-      color: var(--bg-navy-dark);
-      border-color: var(--yellow-gold);
-      font-weight: 600;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    }
+    .gen-btn:hover { background: rgba(255, 255, 255, 0.15); color: var(--text-main); }
+    .gen-btn.active { background: var(--yellow-gold); color: var(--bg-navy-dark); font-weight: 600; }
 
-    /* Results Grid & Cards */
-    .alumni-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 25px;
-    }
+    .alumni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
     
     .alumni-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 25px 20px;
-      text-align: center;
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border);
+      border-radius: 20px; padding: 25px 20px; text-align: center; transition: all 0.4s ease;
     }
-    /* แสงสะท้อนมุมการ์ด */
-    .alumni-card::before {
-      content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-      background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-      transform: skewX(-20deg); transition: 0.5s; pointer-events: none;
-    }
-    .alumni-card:hover { 
-      transform: translateY(-8px); 
-      border-color: rgba(255, 215, 0, 0.4); 
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 15px rgba(255, 215, 0, 0.1);
-    }
-    .alumni-card:hover::before { left: 200%; }
+    .alumni-card:hover { transform: translateY(-8px); border-color: rgba(255, 215, 0, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
     .profile-img {
       width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
-      border: 3px solid var(--glass-border); /* เปลี่ยนสีขอบตอน hover */
-      margin: 0 auto 15px; background: rgba(0,0,0,0.2);
-      transition: border-color 0.3s;
+      border: 3px solid rgba(255,255,255,0.2); margin: 0 auto 15px; background: rgba(0,0,0,0.2); transition: 0.3s;
     }
     .alumni-card:hover .profile-img { border-color: var(--yellow-gold); }
     
@@ -227,56 +117,34 @@
     .alumni-id { color: var(--yellow-gold); font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; }
     
     .info-group {
-      background: rgba(0,0,0,0.15);
-      border-radius: 12px;
-      padding: 10px;
-      margin-bottom: 15px;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      text-align: left;
+      background: rgba(0,0,0,0.2); border-radius: 12px; padding: 12px; margin-bottom: 15px;
+      font-size: 0.85rem; color: var(--text-muted); text-align: left;
     }
-    .info-group div { margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .info-group div { margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .info-group div:last-child { margin-bottom: 0; }
     .info-group span:first-child { color: rgba(255,255,255,0.5); }
-    .info-group span:last-child { color: var(--text-main); font-weight: 400; text-align: right; }
+    .info-group span:last-child { color: var(--text-main); }
 
-    .alumni-tag {
-      display: inline-block;
-      background: rgba(255, 215, 0, 0.1);
-      color: var(--yellow-gold);
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      border: 1px solid rgba(255, 215, 0, 0.2);
-    }
-
-    .card-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
-    .btn-sm { padding: 8px 16px; font-size: 0.85rem; border-radius: 10px; flex: 1; }
-    .btn-danger { background: rgba(255, 107, 107, 0.1); color: var(--danger); border: 1px solid rgba(255, 107, 107, 0.3); }
-    .btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-    .btn-edit { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--glass-border); }
+    .alumni-tag { display: inline-block; background: rgba(255, 215, 0, 0.1); color: var(--yellow-gold); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; }
+    
+    .card-actions { margin-top: 20px; }
+    .btn-edit { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--glass-border); width: 100%; border-radius: 10px; padding: 10px; }
     .btn-edit:hover { background: rgba(255, 255, 255, 0.2); }
 
-    /* Modal Form (Glass Style) */
+    /* Modal Form */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(11, 25, 44, 0.7); /* พื้นหลังเข้มขึ้นนิดนึงเพื่อให้ pop up ชัด */
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 100;
-      justify-content: center; align-items: center; padding: 20px;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 100;
+      justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease;
     }
+    .modal.show { display: flex; opacity: 1; }
     .modal-content {
-      background: linear-gradient(135deg, rgba(30, 62, 98, 0.8) 0%, rgba(11, 25, 44, 0.9) 100%);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      width: 100%; max-width: 550px;
-      padding: 35px;
-      max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      background: linear-gradient(135deg, #1E3E62 0%, #0B192C 100%); border: 1px solid var(--glass-border);
+      border-radius: 24px; width: 100%; max-width: 550px; padding: 35px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: 0.3s ease;
     }
-    /* Custom Scrollbar สำหรับ Modal */
-    .modal-content::-webkit-scrollbar { width: 8px; }
-    .modal-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    .modal.show .modal-content { transform: translateY(0); }
+    .modal-content::-webkit-scrollbar { width: 6px; }
     .modal-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
     .modal-header { margin-bottom: 25px; text-align: center; }
@@ -284,20 +152,32 @@
     
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); padding-left: 5px; }
-    .form-group input, .form-group select { width: 100%; }
-    
     .form-row { display: flex; gap: 15px; }
     .form-row .form-group { flex: 1; }
-
     .modal-actions { display: flex; gap: 15px; margin-top: 30px; }
     .modal-actions .btn { flex: 1; padding: 15px; font-size: 1.05rem; }
 
-    .loading { text-align: center; padding: 40px; font-size: 1.2rem; color: var(--yellow-gold); display: none; }
-    
-    /* Utility class สำหรับข้อความว่าง */
+    /* Loader Spinner */
+    .loading-wrapper { display: none; text-align: center; padding: 40px; grid-column: 1/-1; }
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid rgba(255,215,0,0.2);
+      border-top: 4px solid var(--yellow-gold); border-radius: 50%;
+      animation: spin 1s linear infinite; margin: 0 auto 15px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .empty-state { grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 40px; font-size: 1.1rem; }
 
-    /* Responsive */
+    /* Toast Notification */
+    #toast {
+      position: fixed; top: 20px; right: 20px; background: #333; color: #fff; padding: 15px 25px;
+      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000;
+      transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      font-weight: 500; display: flex; align-items: center; gap: 10px;
+    }
+    #toast.show { transform: translateX(0); }
+    #toast.success { background: rgba(46, 204, 113, 0.9); backdrop-filter: blur(5px); }
+    #toast.error { background: rgba(231, 76, 60, 0.9); backdrop-filter: blur(5px); }
+
     @media (max-width: 600px) {
       .search-input-wrapper { min-width: 100%; }
       .search-input-wrapper input { border-radius: 12px; margin-bottom: 10px; }
@@ -309,11 +189,11 @@
   </style>
 </head>
 <body>
-
-  <!-- Background Decor -->
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
 
   <div class="container">
     <header>
@@ -321,7 +201,6 @@
       <p>โรงเรียนวังน้ำคู่ศึกษา</p>
     </header>
 
-    <!-- Controls Panel -->
     <div class="glass-panel controls-container">
       <div class="search-box">
         <div class="search-input-wrapper">
@@ -334,25 +213,24 @@
       <div class="filter-section">
         <span class="filter-label">เลือกดูตามรุ่น:</span>
         <div class="gen-buttons" id="genList">
-          <!-- ปุ่มกดแยกตามรุ่นจะสร้างอัตโนมัติที่นี่ -->
-          <button class="gen-btn active">ทั้งหมด</button>
-          <button class="gen-btn">กำลังโหลด...</button>
+          <button class="gen-btn active">กำลังโหลดรุ่น...</button>
         </div>
       </div>
     </div>
 
-    <!-- Loader -->
-    <div class="loading" id="loader">กำลังค้นหาและดึงข้อมูล...</div>
-
     <!-- Results Display -->
     <div class="alumni-grid" id="alumniContainer">
-        <!-- ตัวอย่าง UI Card (จะถูกแทนที่ด้วยข้อมูลจริง) -->
+        <!-- Loader -->
+        <div class="loading-wrapper" id="loader">
+            <div class="spinner"></div>
+            <div style="color: var(--yellow-gold);">กำลังประมวลผลข้อมูล...</div>
+        </div>
     </div>
   </div>
 
-  <!-- CRUD Modal -->
-  <div class="modal" id="crudModal">
-    <div class="modal-content">
+  <!-- Modal Form -->
+  <div class="modal" id="crudModal" onclick="closeModalOutside(event)">
+    <div class="modal-content" id="modalContent">
       <div class="modal-header">
         <h3 id="modalTitle">เพิ่ม/แก้ไข ข้อมูล</h3>
       </div>
@@ -369,17 +247,19 @@
         </div>
         
         <div class="form-row">
-            <div class="form-group" style="flex: 0.5;">
+            <div class="form-group" style="flex: 1;">
               <label>รหัสนักเรียน *</label>
               <input type="text" id="formStudentId" required>
             </div>
-            <div class="form-group" style="flex: 0.5;">
+            <div class="form-group" style="flex: 1;">
                 <label>คำนำหน้า</label>
                 <select id="formPrefix">
                     <option value="">เลือก</option>
-                    <option value="นาย ">นาย</option>
-                    <option value="นางสาว ">นางสาว</option>
-                    <option value="นาง ">นาง</option>
+                    <option value="เด็กชาย">เด็กชาย</option>
+                    <option value="เด็กหญิง">เด็กหญิง</option>
+                    <option value="นาย">นาย</option>
+                    <option value="นางสาว">นางสาว</option>
+                    <option value="นาง">นาง</option>
                 </select>
             </div>
         </div>
@@ -412,7 +292,7 @@
         </div>
         
         <div class="form-group">
-          <label>อัปโหลดรูปภาพโปรไฟล์</label>
+          <label>อัปโหลดรูปภาพโปรไฟล์ (ระบบจะปรับขนาดให้อัตโนมัติ)</label>
           <input type="file" id="formImage" accept="image/*">
         </div>
 
@@ -429,13 +309,47 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzr6lNlla9qAKsJafCdJZrTUt9Jz_FGGFyiN2vQfCfCf3XkZcVxB5tbcM3IJY5EbnVRNg/exec";
     // ****************************************************
 
-    let generationsData = [];
+    let currentAlumniData = []; // เก็บ State ปัจจุบันเพื่อส่งไปหน้าแก้ไข
 
     window.onload = () => {
       fetchGenerations();
     };
 
-    // ดึงปุ่มรายชื่อรุ่น
+    // --- Utility: Toast Notification ---
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.className = ''; 
+        toast.classList.add('show', type);
+        toast.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // --- Utility: Image Compressor (ป้องการ Error จากไฟล์ภาพขนาดใหญ่) ---
+    function compressImage(file, maxWidth = 800) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > maxWidth) {
+              height = Math.round((maxWidth / width) * height);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); // บีบอัดเป็น JPEG 80%
+          };
+        };
+      });
+    }
+
     async function fetchGenerations() {
       showLoader(true);
       try {
@@ -445,25 +359,27 @@
         });
         const result = await res.json();
         if (result.status === "success") {
-          generationsData = result.data;
           renderGenButtons(result.data);
           populateGenSelect(result.data);
           
-          // โหลดข้อมูลทั้งหมดหรือรุ่นแรกมาแสดงเป็นค่าเริ่มต้น (ถ้าต้องการ)
-          // filterByGen('ALL'); 
+          // โหลดข้อมูลทุกรุ่นเป็นค่าเริ่มต้นเพื่อให้เว็บไม่โล่ง
+          if(result.data.length > 0) {
+             filterByGen(result.data[0]); // โหลดรุ่นล่าสุด (หรือปรับเป็น 'ALL' ถ้าต้องการดึงทุกแผ่น)
+          } else {
+             showLoader(false);
+          }
         }
       } catch (err) { 
-          console.error(err); 
-          document.getElementById('genList').innerHTML = '<span style="color:var(--danger)">ไม่สามารถโหลดข้อมูลรุ่นได้</span>';
+          showToast("ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error");
+          showLoader(false);
       }
-      showLoader(false);
     }
 
     function renderGenButtons(genList) {
       const container = document.getElementById('genList');
-      container.innerHTML = `<button class="gen-btn active" onclick="filterByGen('ALL', this)">ทั้งหมด</button>`;
-      genList.forEach(gen => {
-        container.innerHTML += `<button class="gen-btn" onclick="filterByGen('${gen}', this)">${gen}</button>`;
+      container.innerHTML = '';
+      genList.forEach((gen, index) => {
+        container.innerHTML += `<button class="gen-btn ${index === 0 ? 'active' : ''}" onclick="filterByGen('${gen}', this)">${gen}</button>`;
       });
     }
 
@@ -472,19 +388,13 @@
       select.innerHTML = '<option value="">เลือกรุ่น...</option>' + genList.map(g => `<option value="${g}">${g}</option>`).join('');
     }
 
-    // 1. ค้นหาด้วยรหัสนักเรียน/ชื่อ
     async function searchData() {
       const q = document.getElementById('searchInput').value.trim();
-      if (!q) {
-          alert("กรุณาพิมพ์คำค้นหา");
-          return;
-      }
+      if (!q) return showToast("กรุณาพิมพ์คำค้นหา", "error");
       
-      // เอา active ออกจากปุ่มรุ่นทั้งหมด
       document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
       
       showLoader(true);
-      document.getElementById('alumniContainer').innerHTML = ''; // เคลียร์ของเก่า
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -493,32 +403,22 @@
         const result = await res.json();
         renderCards(result.data || []);
       } catch (err) { 
-          console.error(err); 
-          alert("เกิดข้อผิดพลาดในการค้นหา");
+          showToast("เกิดข้อผิดพลาดในการค้นหา", "error");
+          showLoader(false);
       }
-      showLoader(false);
     }
 
-    // กด Enter ในช่องค้นหาได้
     document.getElementById('searchInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') searchData();
     });
 
-    // 2. กดดูตามรุ่น
-    async function filterByGen(genName, btn) {
-      // จัดการ UI ปุ่ม Active
+    async function filterByGen(genName, btn = null) {
       if(btn) {
           document.querySelectorAll('.gen-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
       }
 
-      if (genName === 'ALL') {
-        document.getElementById('alumniContainer').innerHTML = '<div class="empty-state">กรุณาเลือกรุ่น หรือค้นหาข้อมูล</div>';
-        return;
-      }
-
       showLoader(true);
-      document.getElementById('alumniContainer').innerHTML = '';
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -526,22 +426,24 @@
         });
         const result = await res.json();
         renderCards(result.data || []);
-      } catch (err) { console.error(err); }
-      showLoader(false);
+      } catch (err) { 
+          showToast("เกิดข้อผิดพลาดในการดึงข้อมูล", "error");
+          showLoader(false);
+      }
     }
 
-    // แสดงการ์ดข้อมูลศิษย์เก่า (ดีไซน์ใหม่)
     function renderCards(data) {
       const container = document.getElementById('alumniContainer');
+      currentAlumniData = data; // เก็บลง State
+      
       if (data.length === 0) {
-        container.innerHTML = `<div class="empty-state">ไม่พบข้อมูลศิษย์เก่า</div>`;
+        container.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลศิษย์เก่าที่ค้นหา</div>`;
         return;
       }
       
-      container.innerHTML = data.map(item => `
+      container.innerHTML = data.map((item, index) => `
         <div class="alumni-card">
           <img src="${item.imageUrl}" class="profile-img" onerror="this.src='https://via.placeholder.com/150/1E3E62/FFFFFF?text=No+Photo'">
-          
           <div class="alumni-name">${item.prefix}${item.fname} ${item.lname}</div>
           <div class="alumni-id">รหัส: ${item.studentId}</div>
           
@@ -550,18 +452,16 @@
               <div><span>เบอร์โทร:</span> <span>${item.phone || '-'}</span></div>
               <div><span>LINE ID:</span> <span>${item.lineId || '-'}</span></div>
           </div>
-          
           <span class="alumni-tag">${item.sheetName}</span>
           
           <div class="card-actions">
-            <button class="btn btn-edit btn-sm" onclick='editItem(${JSON.stringify(item).replace(/'/g, "\\'")})'>แก้ไข</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.sheetName}', ${item.rowIndex})">ลบ</button>
+            <!-- ส่ง Index แทน Object เพื่อป้องกันบั๊กเวลาชื่อมี Single Quote -->
+            <button class="btn btn-edit" onclick='editItem(${index})'>แก้ไขข้อมูล</button>
           </div>
         </div>
       `).join('');
     }
 
-    // ระบบ CRUD: แก้ไข/บันทึก
     document.getElementById('alumniForm').onsubmit = async (e) => {
       e.preventDefault();
       
@@ -574,11 +474,8 @@
       let base64String = "";
       
       if (fileInput.files.length > 0) {
-        base64String = await new Promise(r => {
-          const reader = new FileReader();
-          reader.onload = () => r(reader.result);
-          reader.readAsDataURL(fileInput.files[0]);
-        });
+        // ใช้ฟังก์ชันบีบอัดรูปภาพก่อนส่ง
+        base64String = await compressImage(fileInput.files[0]);
       }
 
       const payload = {
@@ -603,59 +500,35 @@
         const result = await res.json();
         
         if(result.status === 'success') {
-            alert('บันทึกข้อมูลสำเร็จ!');
+            showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
             closeModal();
-            // รีเฟรชข้อมูลของรุ่นที่เพิ่งบันทึก
-            fetchGenerations(); 
+            fetchGenerations(); // โหลดข้อมูลใหม่
         } else {
-             alert('เกิดข้อผิดพลาด: ' + result.message);
+             showToast('เกิดข้อผิดพลาด: ' + result.message, "error");
         }
       } catch (err) { 
-          alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'); 
-          console.error(err);
+          showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', "error");
       } finally {
           submitBtn.innerText = originalBtnText;
           submitBtn.disabled = false;
       }
     };
 
-    async function deleteItem(sheetName, rowIndex) {
-      if (!confirm('คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้? การกระทำนี้ไม่สามารถย้อนกลับได้')) return;
-      
-      showLoader(true);
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "delete", sheetName, rowIndex })
-        });
-        const result = await res.json();
-        
-        if(result.status === 'success') {
-             alert('ลบข้อมูลเรียบร้อยแล้ว');
-             fetchGenerations(); // รีเฟรช
-        } else {
-             alert('เกิดข้อผิดพลาด: ' + result.message);
-        }
-      } catch (err) { alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
-      showLoader(false);
-    }
-
-    function editItem(item) {
+    function editItem(index) {
+      const item = currentAlumniData[index];
       document.getElementById('modalTitle').innerText = 'แก้ไขข้อมูลศิษย์เก่า';
       
       document.getElementById('editRowIndex').value = item.rowIndex;
       document.getElementById('editSheetName').value = item.sheetName;
-      
       document.getElementById('formGen').value = item.sheetName;
       document.getElementById('formStudentId').value = item.studentId;
-      document.getElementById('formPrefix').value = item.prefix;
+      document.getElementById('formPrefix').value = item.prefix.trim(); // ลบ space ส่วนเกิน
       document.getElementById('formFname').value = item.fname;
       document.getElementById('formLname').value = item.lname;
       document.getElementById('formNickname').value = item.nickname !== '-' ? item.nickname : '';
       document.getElementById('formPhone').value = item.phone !== '-' ? item.phone : '';
       document.getElementById('formLineId').value = item.lineId !== '-' ? item.lineId : '';
       
-      // ไม่บังคับเลือกรุ่นหรือเปลี่ยนรหัสนักเรียนตอนแก้ไข (ป้องกันข้อมูลพังข้ามชีต)
       document.getElementById('formGen').disabled = true;
       document.getElementById('formStudentId').readOnly = true;
       document.getElementById('formStudentId').style.opacity = '0.7';
@@ -664,8 +537,9 @@
     }
 
     function openModal() { 
-        document.getElementById('crudModal').style.display = 'flex'; 
-        // ถ้าเป็นการเปิดเพื่อ "เพิ่มข้อมูลใหม่" (ไม่มี rowIndex) ให้ปลดล็อคฟิลด์
+        const modal = document.getElementById('crudModal');
+        modal.classList.add('show');
+        
         if(!document.getElementById('editRowIndex').value) {
             document.getElementById('modalTitle').innerText = 'เพิ่มข้อมูลศิษย์เก่าใหม่';
             document.getElementById('formGen').disabled = false;
@@ -675,13 +549,34 @@
     }
     
     function closeModal() {
-      document.getElementById('crudModal').style.display = 'none';
-      document.getElementById('alumniForm').reset();
-      document.getElementById('editRowIndex').value = '';
-      document.getElementById('editSheetName').value = '';
+      const modal = document.getElementById('crudModal');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('alumniForm').reset();
+        document.getElementById('editRowIndex').value = '';
+        document.getElementById('editSheetName').value = '';
+      }, 300); // รอให้ Animation เล่นเสร็จค่อยเคลียร์ค่า
+    }
+
+    // คลิกพื้นที่ว่างเพื่อปิด Modal
+    function closeModalOutside(event) {
+        const modalContent = document.getElementById('modalContent');
+        if (!modalContent.contains(event.target)) {
+            closeModal();
+        }
     }
     
-    function showLoader(show) { document.getElementById('loader').style.display = show ? 'block' : 'none'; }
+    function showLoader(show) { 
+      const container = document.getElementById('alumniContainer');
+      const loader = document.getElementById('loader');
+      if (show) {
+         container.innerHTML = '';
+         container.appendChild(loader);
+         loader.style.display = 'block';
+      } else {
+         loader.style.display = 'none';
+      }
+    }
   </script>
 </body>
 </html>
