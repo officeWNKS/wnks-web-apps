@@ -7,362 +7,322 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --primary: #d4af37; /* Gold */
-            --primary-glow: rgba(212, 175, 55, 0.4);
-            --available: #10b981; /* Green */
-            --pending: #f59e0b; /* Yellow/Orange */
-            --confirmed: #475569; /* Slate/Grey */
-            
-            /* Glassmorphism Variables */
-            --glass-bg: rgba(255, 255, 255, 0.03);
+            --bg-color: #0B1120; /* สีพื้นหลังสีกรมท่าเข้ม สบายตา */
+            --glass-bg: rgba(30, 41, 59, 0.4);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-blur: blur(16px);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            
+            --color-available: #34D399; /* เขียวพาสเทล */
+            --color-pending: #FBBF24;   /* เหลืองทอง */
+            --color-confirmed: #94A3B8; /* เทา */
+            --color-accent: #38BDF8;    /* ฟ้าสดใส */
+            --walkway-color: rgba(251, 191, 36, 0.15); /* สีทางเดินจางๆ */
         }
 
         body {
-            margin: 0; 
-            padding: 20px 10px; 
-            font-family: 'Prompt', sans-serif;
-            background-color: var(--bg-color); 
-            color: white; 
-            min-height: 100vh;
-            overflow-x: hidden; 
-            position: relative;
+            margin: 0; padding: 20px 10px; font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color); color: white; min-height: 100vh;
+            overflow-x: hidden; position: relative;
         }
 
-        /* Animated Background Blobs for Glassmorphism effect */
-        .bg-blobs {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; overflow: hidden; pointer-events: none;
+        /* Ambient Background Glow (Glassmorphism base) */
+        .ambient-glow {
+            position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.5;
+            animation: pulse 10s infinite alternate;
         }
-        .blob {
-            position: absolute; border-radius: 50%; filter: blur(100px);
-            opacity: 0.5; animation: float 15s infinite alternate ease-in-out;
-        }
-        .blob-1 { width: 400px; height: 400px; background: #1e3a8a; top: -100px; left: -100px; }
-        .blob-2 { width: 500px; height: 500px; background: #451a03; bottom: -150px; right: -100px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: #064e3b; top: 40%; left: 30%; animation-delay: -2s; }
+        .glow-1 { top: -10%; left: 10%; width: 40vw; height: 40vw; background: rgba(56, 189, 248, 0.2); }
+        .glow-2 { bottom: -10%; right: 10%; width: 50vw; height: 50vw; background: rgba(251, 191, 36, 0.15); }
 
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(60px, 60px) scale(1.1); }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.2); opacity: 0.6; }
         }
 
-        /* Glass Container Class */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        /* Header Section */
+        /* --- Header & Legend --- */
         .header-section {
-            text-align: center; margin-bottom: 30px;
-            max-width: 800px; margin-left: auto; margin-right: auto;
-            padding: 20px;
+            text-align: center; margin-bottom: 30px; position: relative; z-index: 10;
         }
         h1 { 
-            color: transparent; 
-            background: linear-gradient(135deg, #FDE68A, #D4AF37, #F59E0B);
-            -webkit-background-clip: text; background-clip: text;
-            margin: 0 0 10px 0; text-shadow: 0 4px 20px rgba(212,175,55,0.2);
-            font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 600;
+            background: linear-gradient(to right, #FDE68A, #D4AF37, #FDE68A);
+            -webkit-background-clip: text; color: transparent;
+            margin: 0 0 10px 0; font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 600;
+            text-shadow: 0 4px 20px rgba(212,175,55,0.2);
         }
 
-        /* Status Legend */
         .status-legend { 
-            display:flex; justify-content:center; flex-wrap: wrap; gap:15px; 
-            font-size: 0.9rem; padding: 12px 25px; 
-            width: fit-content; margin: 15px auto 0 auto;
-            border-radius: 50px;
+            display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 15px; 
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            padding: 12px 25px; border-radius: 50px; border: 1px solid var(--glass-border);
+            font-size: 0.9rem; font-weight: 400; box-shadow: var(--glass-shadow);
         }
-        .legend-item { display: flex; align-items: center; gap: 8px; }
-        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+        .status-item { display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
 
-        /* =========================================
-           ระบบแผนผัง (Responsive Interactive Floor Plan)
-           ========================================= */
-        .venue-scroll-wrapper {
-            width: 100%; 
-            overflow-x: auto; /* เลื่อนซ้ายขวาได้ในมือถือ */
-            padding-bottom: 30px;
-            /* แต่ง Scrollbar */
-            scrollbar-width: thin; scrollbar-color: var(--primary) rgba(255,255,255,0.05);
+        /* --- Interactive Floor Plan (Glassmorphism) --- */
+        .venue-wrapper {
+            width: 100%; overflow-x: auto; padding: 20px 0 40px 0;
+            /* ซ่อน scrollbar แต่ยังเลื่อนได้ */
+            scrollbar-width: none; -ms-overflow-style: none;
         }
-        .venue-scroll-wrapper::-webkit-scrollbar { height: 8px; }
-        .venue-scroll-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        .venue-scroll-wrapper::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .venue-wrapper::-webkit-scrollbar { display: none; }
         
         .venue-map {
-            min-width: 1100px; /* ล็อคขนาดขั้นต่ำให้โครงสร้างไม่พัง */
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            padding: 160px 80px 120px 80px; 
+            min-width: 1200px; /* ล็อคขนาดให้ผังตรงตามสัดส่วน */
+            max-width: 1400px;
+            margin: 0 auto; position: relative;
+            background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 40px;
+            padding: 180px 100px 180px 150px; /* เว้นที่ให้ UI รอบๆ */
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 20px 50px rgba(0,0,0,0.3);
         }
 
-        /* ของตกแต่งในแผนผัง (ตกแต่งสไตล์กระจก) */
-        .stage {
+        /* --- Map Decorations --- */
+        .stage-area {
             position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
-            padding: 20px 150px; font-size: 1.8rem; font-weight: 600; color: var(--primary);
-            text-align: center; border-radius: 100px 100px 20px 20px;
-            border-top: 3px solid var(--primary);
-            box-shadow: 0 -10px 40px var(--primary-glow);
+            background: linear-gradient(180deg, #1E293B, #0F172A);
+            border: 2px solid var(--color-pending); border-radius: 40px;
+            padding: 20px 180px; font-size: 1.6rem; font-weight: 600; color: var(--color-pending);
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.1); text-align: center;
         }
-        
+        .stage-area::before {
+            content: '🎵🥁🎺'; display: block; font-size: 1.2rem; margin-bottom: 5px; opacity: 0.8;
+        }
+
         .cooking-zone {
-            position: absolute; left: 20px; top: 40%; transform: translateY(-50%);
-            height: 400px; width: 60px;
+            position: absolute; left: 30px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .kitchen-box {
+            background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; width: 70px; height: 250px;
             display: flex; align-items: center; justify-content: center;
-            writing-mode: vertical-rl; text-orientation: mixed; transform: translateY(-50%) rotate(180deg);
-            font-size: 1.2rem; font-weight: 500; color: #cbd5e1; letter-spacing: 3px;
+            writing-mode: vertical-rl; transform: rotate(180deg);
+            color: #CBD5E1; font-weight: 500; letter-spacing: 3px; font-size: 1.1rem;
         }
 
         .music-console {
-            position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
-            padding: 10px 40px; border-radius: 30px;
-            color: #94a3b8; font-size: 0.9rem; letter-spacing: 1px;
-            z-index: 0; pointer-events: none;
+            position: absolute; left: 50%; top: 43%; transform: translate(-50%, -50%);
+            background: rgba(15, 23, 42, 0.9); border: 1px solid var(--color-accent);
+            color: var(--color-accent); padding: 10px 40px; border-radius: 15px;
+            font-size: 0.9rem; font-weight: 500; z-index: 5;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
         }
 
-        .entrance-area {
-            position: absolute; bottom: 40px; left: 0; width: 100%;
-            display: flex; justify-content: center; gap: 80px; align-items: flex-end;
+        .entrance-zone {
+            position: absolute; bottom: 30px; left: 0; width: 100%;
+            display: flex; justify-content: center; gap: 15vw; align-items: flex-end;
         }
-        .entrance-box { 
-            padding: 12px 30px; border-radius: 15px; font-size: 1rem; color: #cbd5e1;
-            border: 1px dashed rgba(255,255,255,0.3); background: rgba(0,0,0,0.2);
+        .gate-box {
+            background: var(--glass-bg); border: 1px dashed rgba(255,255,255,0.2);
+            padding: 15px 40px; border-radius: 15px; color: #CBD5E1; font-size: 1rem;
+            backdrop-filter: blur(5px);
         }
+        .gate-main { border-color: var(--color-available); color: var(--color-available); font-weight: 600; box-shadow: 0 0 20px rgba(52, 211, 153, 0.1); }
 
-        /* =========================================
-           Grid จัดการโต๊ะ 150 โต๊ะ (10 คอลัมน์ x 15 แถว)
-           แบ่งโซน ซ้าย 3 - กลาง 4 - ขวา 3
-           ========================================= */
+        /* --- Grid & CSS Layout Magic (จำลองจากภาพ) --- */
         .table-grid {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 25px 15px; /* ระยะห่างระหว่างโต๊ะ */
+            grid-template-columns: repeat(7, 1fr); /* 7 คอลัมน์ต่อแถว (ซ้าย 2, กลาง 3, ขวา 2) */
+            gap: 25px 20px;
             justify-items: center;
             position: relative;
-            z-index: 10;
         }
 
-        /* เทคนิคสร้างทางเดิน (Walkways) โดยอ้างอิงจากลำดับ 1-150 */
-        
-        /* ทางเดินแนวตั้ง 2 เส้น (แยกโซนซ้าย-กลาง-ขวา) */
-        .table-card:nth-child(10n + 3) { margin-right: 50px; } /* หลังคอลัมน์ 3 */
-        .table-card:nth-child(10n + 7) { margin-right: 50px; } /* หลังคอลัมน์ 7 */
+        /* ทางเดินแนวตั้งหลัก (แบ่งซ้าย-กลาง-ขวา) */
+        /* หลังคอลัมน์ที่ 2 (ซ้าย) และ หลังคอลัมน์ที่ 5 (กลาง) */
+        .table-card:nth-child(7n + 2) { margin-right: 90px; }
+        .table-card:nth-child(7n + 5) { margin-right: 90px; }
 
-        /* ทางเดินแนวนอน 2 เส้น (แยกโซนบน-กลาง-ล่าง) 
-           แถวละ 10 โต๊ะ -> ทางเดินอยู่หลังโต๊ะที่ 50 และ 100 */
-        .table-card:nth-child(n+41):nth-child(-n+50) { margin-bottom: 80px; }
-        .table-card:nth-child(n+91):nth-child(-n+100) { margin-bottom: 80px; }
+        /* ทางเดินแนวนอน (แบ่งโซนบน-กลาง-ล่าง) */
+        /* สมมติ 150 โต๊ะ = 21 แถว ตัดทางเดินหลังแถวที่ 7 (โต๊ะ 49) และ แถวที่ 14 (โต๊ะ 98) */
+        .table-card:nth-child(n+43):nth-child(-n+49) { margin-bottom: 110px; }
+        .table-card:nth-child(n+92):nth-child(-n+98) { margin-bottom: 110px; }
 
-        /* ========================================= */
 
-        /* การ์ดโต๊ะแต่ละตัว */
+        /* --- Table Styling --- */
         .table-card {
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            width: 70px; transition: 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; gap: 8px; width: 85px; 
         }
         
+        /* เก้าอี้รอบโต๊ะ (ใช้ border แบบ dashed สร้างเอฟเฟกต์) */
+        .table-wrapper {
+            position: relative; width: 70px; height: 70px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 3px dashed rgba(255,255,255,0.15); /* แทนเก้าอี้ */
+            padding: 4px; transition: 0.3s;
+        }
+
         .table-btn {
-            width: 55px; height: 55px; border-radius: 50%;
+            width: 100%; height: 100%; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; font-weight: 600; cursor: pointer;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px);
-            border: 2px solid rgba(255,255,255,0.1);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        
-        /* เก้าอี้จำลองล้อมรอบโต๊ะ (สไตล์มินิมอล) */
-        .table-btn::before {
-            content: ''; position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px;
-            border-radius: 50%; border: 1px dashed rgba(255,255,255,0.15);
-            pointer-events: none; transition: 0.3s;
+            font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.8); border: 2px solid transparent;
         }
 
-        /* สถานะสีของโต๊ะ */
+        /* Status Colors */
         .table-btn.ว่าง { 
-            color: var(--available); border-color: rgba(16, 185, 129, 0.5); 
+            color: var(--color-available); border-color: rgba(52, 211, 153, 0.4); 
+            box-shadow: inset 0 0 15px rgba(52, 211, 153, 0.1); cursor: pointer;
         }
-        .table-btn.ว่าง:hover { 
-            transform: scale(1.15) translateY(-5px); 
-            background: rgba(16, 185, 129, 0.1); 
-            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); 
-            border-color: var(--available);
-        }
-        .table-btn.ว่าง:hover::before { border-color: var(--available); transform: rotate(15deg); }
-
         .table-btn.รอตรวจสอบ { 
-            color: var(--pending); border-color: rgba(245, 158, 11, 0.5); cursor: not-allowed; 
+            color: var(--color-pending); border-color: rgba(251, 191, 36, 0.4); cursor: not-allowed;
+            box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.1);
         }
         .table-btn.ยืนยันแล้ว { 
-            color: var(--confirmed); border-color: rgba(71, 85, 105, 0.3); 
-            background: rgba(0,0,0,0.4); cursor: not-allowed; 
+            color: var(--color-confirmed); background: rgba(0,0,0,0.5); border-color: rgba(100, 116, 139, 0.3); cursor: not-allowed; 
         }
 
-        /* ข้อมูลใต้โต๊ะ */
+        /* Hover Effect เฉพาะโต๊ะว่าง */
+        .table-wrapper.ว่าง:hover { transform: scale(1.1); border-color: rgba(52, 211, 153, 0.4); }
+        .table-wrapper.ว่าง:hover .table-btn { 
+            background: rgba(52, 211, 153, 0.15); box-shadow: 0 0 20px rgba(52, 211, 153, 0.4);
+        }
+
+        /* Text Below Table */
         .table-info { text-align: center; width: 100%; line-height: 1.2; }
-        .info-status { font-size: 0.65rem; font-weight: 500; margin-bottom: 3px; letter-spacing: 0.5px;}
-        .info-status.ว่าง { color: var(--available); }
-        .info-status.รอตรวจสอบ { color: var(--pending); }
-        .info-status.ยืนยันแล้ว { color: var(--confirmed); }
+        .info-status { font-size: 0.7rem; font-weight: 500; margin-bottom: 3px; }
+        .info-status.ว่าง { color: var(--color-available); }
+        .info-status.รอตรวจสอบ { color: var(--color-pending); }
+        .info-status.ยืนยันแล้ว { color: var(--color-confirmed); }
         
         .info-booker { 
-            font-size: 0.75rem; color: #e2e8f0;
+            font-size: 0.75rem; color: rgba(255,255,255,0.8);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            width: 100%; padding: 3px 5px; box-sizing: border-box;
-            background: rgba(0,0,0,0.4); border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.05);
+            width: 100%; padding: 3px 0; background: rgba(0,0,0,0.3); border-radius: 6px;
         }
 
-        /* =========================================
-           Modal Glassmorphism
-           ========================================= */
+        /* --- Glass Modal --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            display: flex; justify-content: center; align-items: center; z-index: 999;
-            opacity: 0; visibility: hidden; transition: 0.4s ease; padding: 15px; box-sizing: border-box;
+            background: rgba(11, 17, 32, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: 0.3s ease; padding: 20px; box-sizing: border-box;
         }
         .modal.active { opacity: 1; visibility: visible; }
         
         .modal-content {
-            background: rgba(15, 23, 42, 0.7);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 35px 30px; width: 100%; max-width: 420px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border);
+            padding: 35px 30px; border-radius: 24px; width: 100%; max-width: 420px;
+            box-shadow: var(--glass-shadow);
             transform: translateY(30px) scale(0.95); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .modal.active .modal-content { transform: translateY(0) scale(1); }
 
-        .modal-header { text-align: center; margin-bottom: 25px; }
-        .modal-header h2 { margin: 0; color: var(--primary); font-weight: 500; font-size: 1.8rem; }
-        .modal-header p { margin: 5px 0 0 0; font-size: 0.9rem; color: #cbd5e1; }
+        .modal h2 { color: var(--color-pending); margin: 0 0 20px 0; text-align: center; font-weight: 500; }
 
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        input, .file-upload-label {
-            width: 100%; padding: 14px 16px; margin: 8px 0; border-radius: 12px;
-            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; font-family: 'Prompt', sans-serif; box-sizing: border-box;
-            transition: 0.3s; font-size: 0.95rem;
+        
+        input {
+            width: 100%; padding: 14px 16px; margin-bottom: 12px; border-radius: 12px;
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; font-family: 'Prompt', sans-serif; box-sizing: border-box; font-size: 0.95rem;
+            transition: 0.3s;
         }
-        input::placeholder { color: rgba(255,255,255,0.4); }
-        input:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.5); box-shadow: 0 0 15px rgba(212,175,55,0.15); }
+        input:focus { outline: none; border-color: var(--color-pending); background: rgba(0,0,0,0.6); }
         input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.7; cursor: pointer; }
 
+        /* Custom File Upload */
         input[type="file"] { display: none; }
         .file-upload-label { 
-            border: 1px dashed rgba(255,255,255,0.3); cursor: pointer; text-align: center; 
-            background: rgba(255, 255, 255, 0.03); padding: 25px 10px; margin-top: 15px;
+            display: block; border: 1px dashed rgba(255,255,255,0.3); cursor: pointer; 
+            text-align: center; background: rgba(0, 0, 0, 0.2); padding: 25px 15px; 
+            border-radius: 12px; margin-bottom: 15px; transition: 0.3s;
         }
-        .file-upload-label:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--primary); }
-        .file-name { font-size: 0.85rem; color: var(--primary); margin-top: 8px; word-break: break-all; }
+        .file-upload-label:hover { background: rgba(0, 0, 0, 0.4); border-color: var(--color-pending); }
+        .file-name { font-size: 0.85rem; color: var(--color-pending); margin-top: 8px; word-break: break-all; }
 
-        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 500; font-family: 'Prompt', sans-serif; cursor: pointer; transition: 0.3s; margin-top: 15px; font-size: 1.05rem; }
-        .btn-submit { background: linear-gradient(135deg, #FBBF24, #D97706); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4); }
-        .btn-cancel { background: transparent; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px; }
-        .btn-cancel:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+        .btn { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 500; 
+            font-family: 'Prompt', sans-serif; cursor: pointer; transition: 0.3s; margin-top: 8px; font-size: 1rem; 
+        }
+        .btn-submit { 
+            background: linear-gradient(135deg, #FBBF24, #D97706); color: #000; 
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); 
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4); }
+        .btn-cancel { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.05); }
         
-        #loading { text-align: center; color: var(--primary); padding: 80px 0; grid-column: 1 / -1; font-size: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 15px;}
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+        #loading { text-align: center; color: rgba(255,255,255,0.7); padding: 80px 0; grid-column: 1 / -1; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <!-- Background Effect -->
-    <div class="bg-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
+    <!-- Background Elements -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
 
-    <div class="header-section glass-panel">
+    <div class="header-section">
         <h1>50 ปี โรงเรียนวังน้ำคู้ศึกษา</h1>
-        <p style="color: #cbd5e1; margin: 0; font-size: 1.1rem;">แผนผังจองโต๊ะจีน จำนวน 150 โต๊ะ (1 โต๊ะ = 8 ที่นั่ง)</p>
+        <p style="color: rgba(255,255,255,0.7); margin: 0 0 20px 0;">แผนผังจองโต๊ะจีน (1 โต๊ะ = 8 ที่นั่ง)</p>
         
-        <div class="status-legend glass-panel" style="border-radius: 15px;">
-            <div class="legend-item"><i class="status-dot" style="background:var(--available); box-shadow: 0 0 8px var(--available);"></i> <span style="color:var(--available);">ว่าง (กดจองได้)</span></div>
-            <div class="legend-item"><i class="status-dot" style="background:var(--pending); box-shadow: 0 0 8px var(--pending);"></i> <span style="color:var(--pending);">รอตรวจสอบ</span></div>
-            <div class="legend-item"><i class="status-dot" style="background:var(--confirmed);"></i> <span style="color:var(--confirmed);">ยืนยันแล้ว</span></div>
+        <div class="status-legend">
+            <span class="status-item" style="color:var(--color-available);"><i class="status-dot" style="background:var(--color-available);"></i> ว่าง (กดจองได้)</span>
+            <span class="status-item" style="color:var(--color-pending);"><i class="status-dot" style="background:var(--color-pending);"></i> รอตรวจสอบ</span>
+            <span class="status-item" style="color:var(--color-confirmed);"><i class="status-dot" style="background:var(--color-confirmed);"></i> ยืนยันแล้ว</span>
         </div>
     </div>
 
-    <!-- แผนผังจำลองสถานที่จริง แบบเลื่อนได้ -->
-    <div class="venue-scroll-wrapper">
-        <div class="venue-map glass-panel">
-            <div class="stage glass-panel">เวทีของงาน</div>
-            <div class="cooking-zone glass-panel">Cooking Zone</div>
-            <div class="music-console glass-panel">Music Console</div>
+    <!-- Interactive Floor Plan -->
+    <div class="venue-wrapper">
+        <div class="venue-map">
+            <!-- จุดตกแต่งในแผนผัง -->
+            <div class="stage-area">เวทีของงาน</div>
             
-            <div class="table-grid" id="grid">
-                <div id="loading">
-                    <div class="spinner"></div>
-                    กำลังซิงค์แผนผังและข้อมูล...
-                </div>
+            <div class="cooking-zone">
+                <div class="kitchen-box">Cooking Zone</div>
+                <div class="kitchen-box">Cooking Zone</div>
             </div>
 
-            <div class="entrance-area">
-                <div class="entrance-box">📸 แบ็คดรอปถ่ายรูป</div>
-                <div class="entrance-box glass-panel" style="border-color: var(--primary); color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); font-weight: 500;">✨ ทางเข้างาน ✨</div>
-                <div class="entrance-box">📝 จุดลงทะเบียน</div>
+            <!-- กล่องดนตรีตรงกลางผัง -->
+            <div class="music-console">Music Console</div>
+            
+            <!-- Grid วางโต๊ะจีน -->
+            <div class="table-grid" id="grid">
+                <div id="loading">กำลังซิงค์แผนผังและข้อมูล... ⏳</div>
+            </div>
+
+            <div class="entrance-zone">
+                <div class="gate-box">แบ็คดรอปถ่ายรูป</div>
+                <div class="gate-box gate-main">➡️ ทางเข้างาน</div>
+                <div class="gate-box">จุดลงทะเบียน</div>
             </div>
         </div>
     </div>
 
-    <!-- Modal จองโต๊ะ สไตล์ Glassmorphism -->
+    <!-- Modal จองโต๊ะ -->
     <div class="modal" id="bookModal">
-        <div class="modal-content glass-panel">
-            <div class="modal-header">
-                <h2>โต๊ะ <span id="selectedTable"></span></h2>
-                <p>กรุณากรอกข้อมูลเพื่อทำการจอง</p>
-            </div>
+        <div class="modal-content">
+            <h2>จองโต๊ะ <span id="selectedTable"></span></h2>
             
             <input type="text" id="name" placeholder="ชื่อ-นามสกุล (ผู้จอง)" required autocomplete="off">
-            <input type="text" id="gen" placeholder="ศิษย์เก่ารุ่นที่ (ถ้ามี)" required autocomplete="off">
-            <input type="tel" id="phone" placeholder="เบอร์โทรศัพท์ติดต่อ" required autocomplete="off">
+            <input type="text" id="gen" placeholder="ศิษย์เก่ารุ่นที่ (ถ้ามี)" autocomplete="off">
+            <input type="tel" id="phone" placeholder="เบอร์โทรศัพท์" required autocomplete="off">
             
             <div class="input-group">
                 <input type="date" id="t_date" required title="วันที่โอนเงิน">
                 <input type="time" id="t_time" required title="เวลาที่โอนเงิน">
             </div>
 
-            <label class="file-upload-label glass-panel" for="slip">
-                <div style="font-size:2rem; margin-bottom: 5px;">🧾</div>
-                <div style="font-size:0.95rem; font-weight: 500;">คลิกเพื่ออัปโหลดสลิปการโอนเงิน</div>
-                <div class="file-name" id="fileName">ยังไม่ได้เลือกไฟล์ (ขนาดไม่เกิน 5MB)</div>
+            <label class="file-upload-label" for="slip">
+                <div style="font-size:2rem; margin-bottom: 5px;">📸</div>
+                <div style="font-size:0.95rem;">คลิกเพื่ออัปโหลดสลิปการโอนเงิน</div>
+                <div class="file-name" id="fileName">ยังไม่ได้เลือกไฟล์ (รับเฉพาะรูปภาพไม่เกิน 5MB)</div>
             </label>
             <input type="file" id="slip" accept="image/*" required>
             
-            <button class="btn btn-submit" id="submitBtn" onclick="submitBooking()">ยืนยันการจอง</button>
+            <button class="btn btn-submit" id="submitBtn" onclick="submitBooking()">ยืนยันการส่งสลิปจอง</button>
             <button class="btn btn-cancel" onclick="closeModal()">ยกเลิก</button>
         </div>
     </div>
 
     <script>
-        // ใช้ URL เดิมจาก Google Sheet ของคุณได้เลย
+        // *** วาง URL ล่าสุดของ Google Apps Script ตรงนี้ ***
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzl5Av1q49qTxa_qC_x4jY6Fjpwz95nHow8RqDY8nfbLIXkVInhJbfyULxXheNHUbyTAA/exec';
         let currentTable = '';
 
         document.getElementById('slip').addEventListener('change', function(e) {
             const fileName = e.target.files[0] ? e.target.files[0].name : "ยังไม่ได้เลือกไฟล์";
             document.getElementById('fileName').innerText = fileName;
-            if(e.target.files[0]) {
-                document.querySelector('.file-upload-label').style.borderColor = 'var(--primary)';
-                document.querySelector('.file-upload-label').style.background = 'rgba(212, 175, 55, 0.1)';
-            }
         });
 
         async function loadTables() {
@@ -372,18 +332,28 @@
                 const grid = document.getElementById('grid');
                 grid.innerHTML = '';
                 
-                tables.forEach((t) => {
+                tables.forEach((t, index) => {
+                    // 1. สร้าง Card หลัก
                     const card = document.createElement('div');
                     card.className = 'table-card';
 
+                    // 2. สร้างโครงเก้าอี้และโต๊ะ
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `table-wrapper ${t.Status}`;
+                    
                     const btn = document.createElement('div');
                     btn.className = `table-btn ${t.Status}`;
                     btn.innerText = t.Table_ID;
+                    
                     if(t.Status === 'ว่าง') {
-                        btn.onclick = () => openModal(t.Table_ID);
-                        btn.title = "คลิกเพื่อจองโต๊ะนี้";
+                        wrapper.onclick = () => openModal(t.Table_ID);
+                        wrapper.title = "คลิกเพื่อจองโต๊ะนี้";
+                        wrapper.style.cursor = 'pointer';
                     }
 
+                    wrapper.appendChild(btn);
+
+                    // 3. ข้อมูลแสดงใต้โต๊ะ
                     const info = document.createElement('div');
                     info.className = 'table-info';
                     
@@ -396,16 +366,18 @@
                     
                     let displayName = (t.Status !== 'ว่าง' && t.Booker_Name) ? t.Booker_Name : '-';
                     bookerText.innerText = displayName;
-                    bookerText.title = displayName;
+                    bookerText.title = displayName; 
 
                     info.appendChild(statusText);
                     info.appendChild(bookerText);
-                    card.appendChild(btn);
+
+                    // ประกอบร่าง
+                    card.appendChild(wrapper);
                     card.appendChild(info);
                     grid.appendChild(card);
                 });
             } catch (error) {
-                document.getElementById('grid').innerHTML = '<div id="loading" style="color:#ef4444;">⚠️<br>เชื่อมต่อข้อมูลล้มเหลว<br>โปรดรีเฟรชหน้าเว็บใหม่อีกครั้ง</div>';
+                document.getElementById('grid').innerHTML = '<div id="loading" style="color:#EF4444;">เชื่อมต่อล้มเหลว โปรดรีเฟรชหน้าเว็บใหม่</div>';
             }
         }
 
@@ -421,9 +393,7 @@
             document.getElementById('t_date').value = '';
             document.getElementById('t_time').value = '';
             document.getElementById('slip').value = '';
-            document.getElementById('fileName').innerText = 'ยังไม่ได้เลือกไฟล์ (ขนาดไม่เกิน 5MB)';
-            document.querySelector('.file-upload-label').style.borderColor = 'rgba(255,255,255,0.3)';
-            document.querySelector('.file-upload-label').style.background = 'rgba(255, 255, 255, 0.03)';
+            document.getElementById('fileName').innerText = 'ยังไม่ได้เลือกไฟล์ (รับเฉพาะรูปภาพ)';
         }
         
         function closeModal() { document.getElementById('bookModal').classList.remove('active'); }
@@ -445,8 +415,8 @@
             const tTime = document.getElementById('t_time').value;
             const fileInput = document.getElementById('slip');
 
-            if(!name || !gen || !phone || !tDate || !tTime || fileInput.files.length === 0) {
-                alert("กรุณากรอกข้อมูลและแนบสลิปให้ครบถ้วน"); return;
+            if(!name || !phone || !tDate || !tTime || fileInput.files.length === 0) {
+                alert("กรุณากรอกข้อมูลสำคัญและแนบสลิปให้ครบถ้วน"); return;
             }
 
             const file = fileInput.files[0];
@@ -457,7 +427,7 @@
 
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerText;
-            submitBtn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:3px;display:inline-block;vertical-align:middle;margin-right:10px;"></div> กำลังส่งข้อมูล...';
+            submitBtn.innerText = 'กำลังอัปโหลดและส่งข้อมูล... ⏳';
             submitBtn.style.opacity = '0.7'; submitBtn.disabled = true;
 
             try {
@@ -480,14 +450,15 @@
                 const result = await response.json();
                 
                 if(result.status === 'success') {
-                    alert('ส่งคำขอจองโต๊ะสำเร็จ! โปรดรอเจ้าหน้าที่ตรวจสอบสลิป');
+                    alert('ส่งคำขอจองและอัปโหลดสลิปเรียบร้อยแล้ว โปรดรอตรวจสอบ');
                     closeModal(); loadTables(); 
                 } else {
-                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                    alert('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: ' + result.message);
                 }
             } catch(e) {
-                alert('ระบบได้รับข้อมูลแล้ว แต่อาจใช้เวลาประมวลผลรูปภาพ กรุณารีเฟรชหน้าเว็บเพื่อดูสถานะ');
+                alert('ส่งข้อมูลสำเร็จแต่อาจใช้เวลาประมวลผลรูปภาพ กรุณารีเฟรชหน้าเว็บเพื่อตรวจสอบสถานะ');
                 closeModal(); loadTables();
+                console.error(e);
             } finally {
                 submitBtn.innerText = originalText;
                 submitBtn.style.opacity = '1'; submitBtn.disabled = false;
