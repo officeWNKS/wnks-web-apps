@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <!-- Viewport Lock ป้องกันการซูมและเด้งเวลาพิมพ์ในมือถือ -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ระบบเช็คชื่อ โรงเรียนวังน้ำคู้ศึกษา</title>
   
@@ -12,126 +13,156 @@
   
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
-      --bg-color: #f3f4f6;
-      --primary: #007AFF;
-      --glass-bg: rgba(255, 255, 255, 0.75);
-      --glass-border: rgba(255, 255, 255, 0.4);
+      --bg-light: #f4f4f9;
+      --ios-blue: #007AFF;
+      --ios-blue-active: #0056b3;
     }
     body {
       font-family: 'Prompt', sans-serif;
-      background-color: var(--bg-color);
-      background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+      background-color: var(--bg-light);
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(210, 100%, 95%, 1) 0, transparent 40%), 
+        radial-gradient(at 100% 0%, hsla(220, 100%, 90%, 0.8) 0, transparent 40%);
+      background-attachment: fixed;
       -webkit-tap-highlight-color: transparent;
-      padding-bottom: 90px; /* Space for bottom nav */
+      padding-bottom: 90px;
+      color: #1c1c1e;
     }
-    /* iOS Glassmorphism Utilities */
+    
     .glass-panel {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
     }
+    
     .ios-input {
       background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(0,0,0,0.05);
-      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      appearance: none;
     }
     .ios-input:focus {
       background: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      border-color: var(--ios-blue);
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
       outline: none;
     }
-    
-    /* Segmented Control */
-    .segmented-control { background: #e5e5ea; border-radius: 12px; padding: 3px; display: flex; }
+
+    .segmented-control {
+      background: rgba(118, 118, 128, 0.12);
+      border-radius: 14px;
+      padding: 3px;
+      display: flex;
+    }
     .segmented-control button {
-      flex: 1; padding: 6px 0; font-size: 0.85rem; font-weight: 500; color: #333;
-      border-radius: 10px; transition: all 0.2s ease;
+      flex: 1; padding: 8px 0; font-size: 0.85rem; font-weight: 500; color: #3c3c43;
+      border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .segmented-control button.active {
-      background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: 600; color: black;
+      background: white;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12), 0 3px 1px rgba(0,0,0,0.04);
+      font-weight: 600; color: black;
     }
 
-    /* Radio Status Buttons */
-    .status-radio:checked + label { transform: scale(1.05); font-weight: 600; border-color: transparent; }
+    .status-radio:checked + label { 
+      transform: scale(1.05); 
+      font-weight: 600; 
+      border-color: transparent; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
     .status-radio:checked + label.status-present { background: #dcfce7; color: #166534; }
     .status-radio:checked + label.status-late { background: #fef9c3; color: #854d0e; }
     .status-radio:checked + label.status-sick { background: #ffedd5; color: #9a3412; }
     .status-radio:checked + label.status-leave { background: #e0f2fe; color: #075985; }
     .status-radio:checked + label.status-absent { background: #fee2e2; color: #991b1b; }
 
-    /* Bottom Nav */
     .bottom-nav {
       background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
       border-top: 1px solid rgba(0,0,0,0.05);
       padding-bottom: env(safe-area-inset-bottom);
     }
-    .nav-item { color: #9ca3af; transition: color 0.2s; }
-    .nav-item.active { color: var(--primary); }
-
-    /* Animations */
-    .fade-in { animation: fadeIn 0.3s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .nav-item { color: #999999; transition: color 0.2s; }
+    .nav-item.active { color: var(--ios-blue); }
     
-    /* Slide Over Modal */
-    #studentModal { transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+    /* Touch target optimizations */
+    .active-scale:active { transform: scale(0.96); transition: transform 0.1s; }
+
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(15px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    
+    #studentModal { 
+      transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1); 
+      z-index: 100; /* Ensure above bottom nav */
+    }
     .modal-open { transform: translateY(0%); }
     .modal-closed { transform: translateY(100%); }
+    
+    /* Hide scrollbar for cleaner look */
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
   </style>
 </head>
-<body class="text-gray-800">
+<body>
 
-<div class="max-w-md mx-auto pt-4 px-4 relative z-10">
+<div class="max-w-md mx-auto pt-6 px-4 relative z-10">
+  
   <header class="flex justify-between items-center mb-6 fade-in">
     <div>
-      <h1 class="text-xl font-bold tracking-tight"><i class="bi bi-clock-history text-blue-500 mr-2"></i>ระบบเช็คชื่อ</h1>
-      <p class="text-xs text-gray-500">โรงเรียนวังน้ำคู้ศึกษา</p>
+      <h1 class="text-2xl font-bold tracking-tight text-gray-900"><i class="bi bi-person-bounding-box text-blue-500 mr-2"></i>เช็คชื่อ</h1>
+      <p class="text-xs text-gray-500 font-medium ml-8">โรงเรียนวังน้ำคู้ศึกษา</p>
     </div>
-    <div class="glass-panel px-3 py-1.5 rounded-2xl text-right">
+    <div class="glass-panel px-4 py-2 rounded-2xl text-right flex flex-col justify-center">
       <div id="timeDisplay" class="text-lg font-bold text-blue-600 leading-none">--:--</div>
       <div id="dateDisplay" class="text-[0.65rem] font-medium text-gray-500 mt-1">กำลังโหลด...</div>
     </div>
   </header>
 
   <main id="view-teacher" class="view-section fade-in">
-    <div class="glass-panel p-5 rounded-3xl mb-6">
+    <div class="glass-panel p-5 rounded-[28px] mb-6 shadow-sm">
       <form id="attendanceForm">
         <div class="mb-4">
-          <label class="block text-sm font-semibold text-gray-600 mb-2"><i class="bi bi-person-vcard text-blue-500 mr-1"></i> 1. ครูผู้บันทึก</label>
-          <select id="teacherSelect" class="ios-input w-full rounded-xl px-4 py-3 text-sm" required onchange="localStorage.setItem('teacher', this.value)">
-            <option value="" disabled selected>-- โหลดข้อมูล... --</option>
-          </select>
+          <label class="block text-sm font-semibold text-gray-700 mb-2 ml-1">ครูผู้บันทึก</label>
+          <div class="relative">
+            <i class="bi bi-person-badge absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+            <select id="teacherSelect" class="ios-input w-full rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium" required onchange="localStorage.setItem('teacher', this.value)">
+              <option value="" disabled selected>-- โหลดข้อมูล... --</option>
+            </select>
+          </div>
         </div>
         
         <div class="mb-4">
-          <label class="block text-sm font-semibold text-gray-600 mb-2"><i class="bi bi-door-open text-blue-500 mr-1"></i> 2. ห้องเรียน</label>
-          <select id="roomSelect" class="ios-input w-full rounded-xl px-4 py-3 text-sm" required onchange="localStorage.setItem('room', this.value); loadStudents();">
-            <option value="" disabled selected>-- โหลดข้อมูล... --</option>
-          </select>
+          <label class="block text-sm font-semibold text-gray-700 mb-2 ml-1">ห้องเรียน</label>
+          <div class="relative">
+            <i class="bi bi-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+            <select id="roomSelect" class="ios-input w-full rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium" required onchange="localStorage.setItem('room', this.value); loadStudents();">
+              <option value="" disabled selected>-- โหลดข้อมูล... --</option>
+            </select>
+          </div>
         </div>
 
-        <div id="studentContainer" class="hidden mt-6">
-          <div class="flex justify-between items-end mb-3">
-            <label class="text-sm font-semibold text-gray-600"><i class="bi bi-people text-blue-500 mr-1"></i> 3. รายชื่อนักเรียน</label>
-            <button type="button" onclick="markAllPresent()" class="text-xs bg-green-50 text-green-600 font-bold px-3 py-1.5 rounded-full border border-green-100 shadow-sm">
-              <i class="bi bi-check-all"></i> มาปกติทุกคน
+        <div id="studentContainer" class="hidden mt-6 border-t border-gray-100 pt-5">
+          <div class="flex justify-between items-center mb-4">
+            <label class="text-sm font-bold text-gray-800 ml-1">รายชื่อนักเรียน</label>
+            <button type="button" onclick="markAllPresent()" class="active-scale text-[0.7rem] bg-green-100 text-green-700 font-bold px-3 py-1.5 rounded-full shadow-sm">
+              <i class="bi bi-check-all text-base align-middle"></i> มาปกติทุกคน
             </button>
           </div>
           
-          <div id="studentList" class="bg-white/80 rounded-2xl p-2 border border-gray-100 mb-4 divide-y divide-gray-100 max-h-[50vh] overflow-y-auto">
+          <div id="studentList" class="bg-white rounded-3xl p-2 shadow-sm border border-gray-50 mb-5 divide-y divide-gray-50 max-h-[55vh] overflow-y-auto">
             <!-- Students will be generated here -->
           </div>
 
-          <button type="submit" id="submitBtn" class="w-full bg-gradient-to-b from-blue-400 to-blue-600 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-500/30 transform active:scale-95 transition-all">
-            <i class="bi bi-cloud-arrow-up-fill mr-1"></i> บันทึกข้อมูล
+          <button type="submit" id="submitBtn" class="active-scale w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/30 transition-all text-lg flex justify-center items-center">
+            <i class="bi bi-cloud-arrow-up-fill mr-2 text-xl"></i> บันทึกข้อมูล
           </button>
         </div>
       </form>
@@ -139,66 +170,63 @@
   </main>
 
   <main id="view-public" class="view-section hidden fade-in">
-    <div class="glass-panel p-4 rounded-3xl mb-6">
-      <div class="segmented-control mb-4">
+    <div class="glass-panel p-4 rounded-[28px] mb-6">
+      <div class="segmented-control mb-5">
         <button class="active" id="tab-pub-today-btn" onclick="switchSubTab('pub-today')">สรุปวันนี้</button>
         <button id="tab-pub-history-btn" onclick="switchSubTab('pub-history')">ค้นหาประวัติ</button>
       </div>
 
       <!-- Dashboard Sub View -->
       <div id="tab-pub-today">
-        <div id="publicLoading" class="text-center py-10 hidden"><i class="bi bi-arrow-repeat animate-spin text-3xl text-blue-500"></i></div>
+        <div id="publicLoading" class="text-center py-10 hidden flex flex-col items-center">
+          <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+          <span class="text-sm text-gray-500 font-medium">กำลังโหลดข้อมูล...</span>
+        </div>
         <div id="publicContent">
-          <div id="gradeAccordion" class="space-y-3"></div>
-          <button onclick="loadPublicDashboard()" class="w-full mt-4 bg-white text-blue-600 font-bold py-3 rounded-xl shadow-sm border border-gray-100">
-            <i class="bi bi-arrow-clockwise"></i> อัปเดตข้อมูล
+          <div id="gradeAccordion" class="space-y-4"></div>
+          <button onclick="loadPublicDashboard()" class="active-scale w-full mt-5 bg-white text-blue-600 font-bold py-3.5 rounded-2xl shadow-sm border border-blue-100 flex justify-center items-center">
+            <i class="bi bi-arrow-clockwise mr-2 text-lg"></i> อัปเดตข้อมูล
           </button>
         </div>
       </div>
 
-      <!-- History Sub View -->
+      <!-- History Sub View (Upgraded to Card List) -->
       <div id="tab-pub-history" class="hidden">
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-500 mb-1">ค้นหาจาก</label>
-          <select id="searchType" class="ios-input w-full rounded-xl px-3 py-2 text-sm" onchange="toggleSearchInputs()">
+        <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-50 mb-4">
+          <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">ค้นหาจาก</label>
+          <select id="searchType" class="ios-input w-full rounded-xl px-3 py-2.5 text-sm font-medium mb-4" onchange="toggleSearchInputs()">
             <option value="student">รายบุคคล (นักเรียน)</option>
             <option value="room">รายห้องเรียน</option>
           </select>
-        </div>
-        
-        <div id="studentSearchGroup" class="bg-gray-50 p-3 rounded-2xl mb-4 border border-gray-100">
-          <div class="mb-2">
-            <label class="block text-xs text-gray-500 mb-1">กรองตามห้อง</label>
-            <select id="filterRoomSelect" class="ios-input w-full rounded-lg px-2 py-1.5 text-sm" onchange="filterStudentsForSearch()"></select>
-          </div>
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">ชื่อนักเรียน</label>
-            <select id="searchStudentSelect" class="ios-input w-full rounded-lg px-2 py-1.5 text-sm"></select>
-          </div>
-        </div>
-
-        <div id="roomSearchGroup" class="bg-gray-50 p-3 rounded-2xl mb-4 border border-gray-100 hidden">
-          <label class="block text-xs text-gray-500 mb-1">เลือกห้องเรียน</label>
-          <select id="searchRoomSelect" class="ios-input w-full rounded-lg px-2 py-1.5 text-sm"></select>
-        </div>
-        
-        <button id="searchBtn" onclick="searchHistory()" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl shadow-md">
-          <i class="bi bi-search mr-1"></i> ค้นหาประวัติ
-        </button>
-
-        <div id="historyResultContainer" class="hidden mt-6 border-t pt-4">
-          <div class="flex justify-between items-center mb-2">
-            <span id="historyTitle" class="text-sm font-bold text-gray-700">ผลลัพธ์</span>
-          </div>
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="max-h-64 overflow-y-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-gray-50 sticky top-0">
-                  <tr><th class="py-2 px-3 font-semibold text-gray-600">วัน/เวลา</th><th class="py-2 px-3 font-semibold text-gray-600">ชื่อ</th><th class="py-2 px-3 font-semibold text-gray-600 text-center">สถานะ</th></tr>
-                </thead>
-                <tbody id="historyTableBody" class="divide-y divide-gray-100"></tbody>
-              </table>
+          
+          <div id="studentSearchGroup">
+            <div class="mb-3">
+              <label class="block text-[0.7rem] text-gray-400 mb-1">กรองตามห้อง (ตัวเลือก)</label>
+              <select id="filterRoomSelect" class="ios-input w-full rounded-xl px-3 py-2 text-sm" onchange="filterStudentsForSearch()"></select>
             </div>
+            <div>
+              <label class="block text-[0.7rem] text-gray-400 mb-1">พิมพ์/เลือกชื่อนักเรียน</label>
+              <select id="searchStudentSelect" class="ios-input w-full rounded-xl px-3 py-2 text-sm font-medium text-blue-700"></select>
+            </div>
+          </div>
+
+          <div id="roomSearchGroup" class="hidden">
+            <label class="block text-[0.7rem] text-gray-400 mb-1">เลือกห้องเรียน</label>
+            <select id="searchRoomSelect" class="ios-input w-full rounded-xl px-3 py-2 text-sm font-medium text-blue-700"></select>
+          </div>
+          
+          <button id="searchBtn" onclick="searchHistory()" class="active-scale w-full mt-5 bg-blue-100 text-blue-700 font-bold py-3 rounded-xl shadow-sm">
+            <i class="bi bi-search mr-1"></i> ดูประวัติ
+          </button>
+        </div>
+
+        <div id="historyResultContainer" class="hidden">
+          <div class="flex justify-between items-end mb-3 px-1 border-b border-gray-200 pb-2">
+            <span id="historyTitle" class="text-sm font-bold text-gray-800">ผลลัพธ์</span>
+          </div>
+          <!-- Upgraded from Table to Card List for Mobile -->
+          <div class="max-h-[50vh] overflow-y-auto space-y-2 pb-4" id="historyListBody">
+            <!-- List items render here -->
           </div>
         </div>
       </div>
@@ -206,111 +234,123 @@
   </main>
 
   <main id="view-admin" class="view-section hidden fade-in">
-    <div class="flex justify-between items-center mb-3 px-2">
-      <h2 class="text-lg font-bold text-gray-800"><i class="bi bi-shield-lock-fill text-yellow-500 mr-1"></i> ผู้บริหาร</h2>
-      <button onclick="switchTab('view-teacher', 'nav-checkin')" class="text-xs text-red-500 bg-red-50 px-3 py-1.5 rounded-full font-bold">ปิดหน้าต่าง <i class="bi bi-x"></i></button>
+    <div class="flex justify-between items-center mb-4 px-2">
+      <h2 class="text-2xl font-bold text-gray-900 tracking-tight">ผู้บริหาร</h2>
+      <button onclick="switchTab('view-teacher', 'nav-checkin')" class="active-scale text-xs text-gray-500 bg-white px-3 py-2 rounded-full font-bold shadow-sm">ปิด <i class="bi bi-x-lg"></i></button>
     </div>
     
-    <div class="glass-panel p-4 rounded-3xl mb-6">
-      <div id="adminLoading" class="text-center py-10 hidden"><i class="bi bi-arrow-repeat animate-spin text-3xl text-yellow-500"></i></div>
+    <div class="glass-panel p-4 rounded-[28px] mb-6">
+      <div id="adminLoading" class="text-center py-10 hidden flex flex-col items-center">
+        <div class="w-10 h-10 border-4 border-yellow-200 border-t-yellow-500 rounded-full animate-spin mb-3"></div>
+      </div>
       
       <div id="adminContent">
-        <!-- Dashboard Today -->
-        <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-5 text-white text-center shadow-lg mb-4">
-          <p class="text-xs opacity-80 mb-1">ยอดผู้เรียนที่เช็คชื่อแล้ววันนี้</p>
-          <h1 class="text-5xl font-bold tracking-tighter" id="ad-total">0</h1>
+        <div class="bg-gradient-to-br from-gray-900 to-gray-700 rounded-3xl p-6 text-white text-center shadow-xl mb-5 relative overflow-hidden">
+          <i class="bi bi-shield-check absolute -right-4 -bottom-4 text-8xl text-white opacity-10"></i>
+          <p class="text-xs text-gray-300 mb-1 uppercase tracking-wider font-semibold">เช็คชื่อแล้ววันนี้</p>
+          <h1 class="text-6xl font-bold tracking-tighter" id="ad-total">0</h1>
         </div>
 
         <div class="grid grid-cols-2 gap-3 mb-6">
-          <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-50 flex items-center">
-            <div class="w-10 h-10 rounded-xl bg-green-50 text-green-500 flex items-center justify-center text-xl mr-3"><i class="bi bi-check-lg"></i></div>
-            <div><p class="text-[0.65rem] text-gray-400 font-bold leading-tight">มาปกติ</p><p class="text-lg font-bold leading-tight" id="ad-present">0</p></div>
+          <div class="bg-white p-4 rounded-3xl shadow-sm flex items-center">
+            <div class="w-12 h-12 rounded-2xl bg-green-50 text-green-500 flex items-center justify-center text-2xl mr-3"><i class="bi bi-check-lg"></i></div>
+            <div><p class="text-[0.65rem] text-gray-400 font-bold mb-0.5">มาปกติ</p><p class="text-xl font-bold text-gray-800 leading-none" id="ad-present">0</p></div>
           </div>
-          <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-50 flex items-center">
-            <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-xl mr-3"><i class="bi bi-clock"></i></div>
-            <div><p class="text-[0.65rem] text-gray-400 font-bold leading-tight">มาสาย</p><p class="text-lg font-bold leading-tight" id="ad-late">0</p></div>
+          <div class="bg-white p-4 rounded-3xl shadow-sm flex items-center">
+            <div class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-2xl mr-3"><i class="bi bi-clock"></i></div>
+            <div><p class="text-[0.65rem] text-gray-400 font-bold mb-0.5">มาสาย</p><p class="text-xl font-bold text-gray-800 leading-none" id="ad-late">0</p></div>
           </div>
-          <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-50 flex items-center">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl mr-3"><i class="bi bi-journal-medical"></i></div>
-            <div><p class="text-[0.65rem] text-gray-400 font-bold leading-tight">ลา/ป่วย</p><p class="text-lg font-bold leading-tight"><span id="ad-leave">0</span>/<span id="ad-sick">0</span></p></div>
+          <div class="bg-white p-4 rounded-3xl shadow-sm flex items-center">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl mr-3"><i class="bi bi-thermometer-half"></i></div>
+            <div><p class="text-[0.65rem] text-gray-400 font-bold mb-0.5">ลา/ป่วย</p><p class="text-xl font-bold text-gray-800 leading-none"><span id="ad-leave">0</span>/<span id="ad-sick">0</span></p></div>
           </div>
-          <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-50 flex items-center">
-            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-xl mr-3"><i class="bi bi-x-lg"></i></div>
-            <div><p class="text-[0.65rem] text-gray-400 font-bold leading-tight">ขาด</p><p class="text-lg font-bold leading-tight" id="ad-absent">0</p></div>
+          <div class="bg-white p-4 rounded-3xl shadow-sm flex items-center">
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center text-2xl mr-3"><i class="bi bi-x-lg"></i></div>
+            <div><p class="text-[0.65rem] text-gray-400 font-bold mb-0.5">ขาด</p><p class="text-xl font-bold text-gray-800 leading-none" id="ad-absent">0</p></div>
           </div>
         </div>
 
-        <button onclick="confirmDataToLine()" id="confirmLineBtn" class="w-full bg-green-500 text-white font-bold py-3.5 rounded-2xl shadow-md flex items-center justify-center mb-6">
-          <i class="bi bi-check-circle-fill mr-2"></i> ยืนยันยอดลงระบบ LINE ผู้ปกครอง
+        <button onclick="confirmDataToLine()" id="confirmLineBtn" class="active-scale w-full bg-[#06C755] text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-500/30 flex items-center justify-center mb-6 text-lg">
+          <i class="bi bi-line mr-2"></i> ยืนยันยอดเข้า LINE
         </button>
 
-        <hr class="border-gray-100 mb-4">
-        
-        <h3 class="text-sm font-bold text-gray-700 mb-3"><i class="bi bi-award text-yellow-500 mr-1"></i> อัตราการเช็คชื่อของครู</h3>
-        <div id="teacherEvalContainer" class="space-y-2"></div>
+        <h3 class="text-sm font-bold text-gray-800 mb-3 ml-1">อัตราการเช็คชื่อของครู</h3>
+        <div id="teacherEvalContainer" class="space-y-3"></div>
       </div>
     </div>
   </main>
 </div>
 
-<div id="studentModal" class="fixed inset-x-0 bottom-0 z-50 h-[85vh] bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] modal-closed flex flex-col">
-  <div class="flex justify-center pt-3 pb-2"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
-  <div class="px-5 pb-2 flex justify-between items-center border-b border-gray-100">
-    <h3 class="font-bold text-lg text-gray-800">ข้อมูลการมาเรียน</h3>
-    <button onclick="closeStudentModal()" class="w-8 h-8 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center"><i class="bi bi-x-lg"></i></button>
+<div id="studentModal" class="fixed inset-x-0 bottom-0 h-[88vh] bg-[#f2f2f7] rounded-t-[32px] shadow-[0_-20px_40px_rgba(0,0,0,0.15)] modal-closed flex flex-col">
+  <div class="flex justify-center pt-3 pb-1"><div class="w-12 h-1.5 bg-gray-300 rounded-full"></div></div>
+  <div class="px-6 pb-2 flex justify-between items-center relative">
+    <h3 class="font-bold text-xl text-gray-900 tracking-tight">โปรไฟล์นักเรียน</h3>
+    <button onclick="closeStudentModal()" class="w-8 h-8 bg-gray-200/80 text-gray-600 rounded-full flex items-center justify-center text-lg active-scale"><i class="bi bi-x"></i></button>
   </div>
   
-  <div class="flex-1 overflow-y-auto p-5 pb-10" id="studentModalContent">
-    <div id="modalLoading" class="text-center py-10"><i class="bi bi-arrow-repeat animate-spin text-3xl text-blue-500"></i></div>
+  <div class="flex-1 overflow-y-auto px-5 pb-10 mt-2" id="studentModalContent">
+    <div id="modalLoading" class="text-center py-20 flex flex-col items-center">
+      <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+      <span class="text-gray-500 font-medium">กำลังดึงข้อมูล...</span>
+    </div>
+    
     <div id="modalData" class="hidden">
-      
-      <div class="text-center mb-6">
-        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl mb-3 shadow-inner"><i class="bi bi-person-fill"></i></div>
-        <h2 class="text-xl font-bold text-gray-800" id="mod-name">ชื่อ-สกุล</h2>
-        <p class="text-sm text-gray-500">รหัส: <span id="mod-id"></span> | ห้อง: <span id="mod-room"></span></p>
-      </div>
-
-      <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
-        <div class="flex justify-between items-end mb-2">
-          <span class="text-sm font-bold text-gray-600">อัตราการมาเรียน</span>
-          <span class="text-2xl font-bold text-blue-600" id="mod-percent">0%</span>
+      <!-- Profile Header -->
+      <div class="bg-white rounded-[24px] p-5 shadow-sm text-center mb-5 border border-gray-100 relative overflow-hidden">
+        <div class="w-20 h-20 bg-gradient-to-tr from-blue-100 to-blue-50 text-blue-600 rounded-full mx-auto flex items-center justify-center text-4xl mb-3 shadow-inner">
+          <i class="bi bi-person-fill"></i>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1"><div class="bg-blue-600 h-2.5 rounded-full" id="mod-bar"></div></div>
-        <p class="text-[0.65rem] text-gray-400 text-right">อิงจากข้อมูลเทอมปัจจุบัน</p>
+        <h2 class="text-xl font-bold text-gray-900 mb-1" id="mod-name">ชื่อ-สกุล</h2>
+        <div class="inline-flex items-center justify-center bg-gray-50 rounded-lg px-3 py-1 border border-gray-100">
+          <span class="text-[0.75rem] text-gray-500 font-medium">รหัส: <span id="mod-id" class="text-gray-800"></span></span>
+          <span class="mx-2 text-gray-300">|</span>
+          <span class="text-[0.75rem] text-gray-500 font-medium">ห้อง: <span id="mod-room" class="text-gray-800"></span></span>
+        </div>
       </div>
 
-      <div class="grid grid-cols-4 gap-2 text-center mb-6">
-        <div class="bg-green-50 p-2 rounded-xl border border-green-100"><div class="text-lg font-bold text-green-600" id="mod-p">0</div><div class="text-[0.6rem] text-gray-500">ปกติ</div></div>
-        <div class="bg-yellow-50 p-2 rounded-xl border border-yellow-100"><div class="text-lg font-bold text-yellow-600" id="mod-l">0</div><div class="text-[0.6rem] text-gray-500">สาย</div></div>
-        <div class="bg-blue-50 p-2 rounded-xl border border-blue-100"><div class="text-lg font-bold text-blue-600" id="mod-sl">0</div><div class="text-[0.6rem] text-gray-500">ลา/ป่วย</div></div>
-        <div class="bg-red-50 p-2 rounded-xl border border-red-100"><div class="text-lg font-bold text-red-600" id="mod-a">0</div><div class="text-[0.6rem] text-gray-500">ขาด</div></div>
+      <!-- Attendance Progress -->
+      <div class="bg-white rounded-[24px] p-5 mb-5 shadow-sm border border-gray-100">
+        <div class="flex justify-between items-end mb-3">
+          <span class="text-sm font-bold text-gray-700">สถิติมาเรียนเทอมนี้</span>
+          <span class="text-3xl font-black text-blue-600 tracking-tighter" id="mod-percent">0%</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-3 mb-4 overflow-hidden">
+          <div class="bg-blue-600 h-3 rounded-full transition-all duration-1000 ease-out" id="mod-bar" style="width: 0%"></div>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-2 text-center mt-2">
+          <div class="flex flex-col"><span class="text-[0.65rem] text-gray-400 font-bold uppercase mb-1">ปกติ</span><span class="text-lg font-bold text-green-600" id="mod-p">0</span></div>
+          <div class="flex flex-col border-l border-gray-100"><span class="text-[0.65rem] text-gray-400 font-bold uppercase mb-1">สาย</span><span class="text-lg font-bold text-yellow-500" id="mod-l">0</span></div>
+          <div class="flex flex-col border-l border-gray-100"><span class="text-[0.65rem] text-gray-400 font-bold uppercase mb-1">ลา/ป่วย</span><span class="text-lg font-bold text-blue-500" id="mod-sl">0</span></div>
+          <div class="flex flex-col border-l border-gray-100"><span class="text-[0.65rem] text-gray-400 font-bold uppercase mb-1">ขาด</span><span class="text-lg font-bold text-red-500" id="mod-a">0</span></div>
+        </div>
       </div>
 
-      <h4 class="text-sm font-bold text-gray-700 mb-3"><i class="bi bi-clock-history mr-1"></i> ประวัติล่าสุด (10 วัน)</h4>
-      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+      <!-- History List -->
+      <h4 class="text-sm font-bold text-gray-800 mb-3 ml-1 uppercase tracking-wider">ประวัติ 10 วันล่าสุด</h4>
+      <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
         <ul id="mod-history" class="divide-y divide-gray-50 text-sm"></ul>
       </div>
-
     </div>
   </div>
 </div>
-<!-- Overlay -->
-<div id="modalOverlay" class="fixed inset-0 bg-black/30 z-40 hidden transition-opacity" onclick="closeStudentModal()"></div>
+<!-- Overlay with blur -->
+<div id="modalOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="closeStudentModal()"></div>
 
-<nav class="bottom-nav fixed bottom-0 w-full flex justify-around items-center pt-2 pb-5 z-30">
-  <button id="nav-checkin" onclick="switchTab('view-teacher', 'nav-checkin')" class="nav-item active flex flex-col items-center w-1/3">
+<nav class="bottom-nav fixed bottom-0 w-full flex justify-around items-center pt-3 pb-6 z-30">
+  <button id="nav-checkin" onclick="switchTab('view-teacher', 'nav-checkin')" class="nav-item active flex flex-col items-center w-1/3 active-scale">
     <i class="bi bi-person-bounding-box text-2xl mb-1"></i><span class="text-[0.65rem] font-medium">เช็คชื่อ</span>
   </button>
-  <button id="nav-public" onclick="switchTab('view-public', 'nav-public'); loadPublicDashboard();" class="nav-item flex flex-col items-center w-1/3">
+  <button id="nav-public" onclick="switchTab('view-public', 'nav-public'); loadPublicDashboard();" class="nav-item flex flex-col items-center w-1/3 active-scale">
     <i class="bi bi-clipboard-data text-2xl mb-1"></i><span class="text-[0.65rem] font-medium">ภาพรวม</span>
   </button>
-  <button id="nav-admin" onclick="promptAdminPin()" class="nav-item flex flex-col items-center w-1/3">
-    <i class="bi bi-shield-check text-2xl mb-1"></i><span class="text-[0.65rem] font-medium">ผู้บริหาร</span>
+  <button id="nav-admin" onclick="promptAdminPin()" class="nav-item flex flex-col items-center w-1/3 active-scale">
+    <i class="bi bi-shield-lock text-2xl mb-1"></i><span class="text-[0.65rem] font-medium">ผู้บริหาร</span>
   </button>
 </nav>
 
 <script>
-  // ⚠️⚠️⚠️ เปลี่ยน URL ด้านล่างนี้เป็น URL ของ Google Apps Script ที่คุณ Deploy ใหม่ ⚠️⚠️⚠️
+  // ⚠️⚠️⚠️ เปลี่ยน URL เป็น Web App URL อันใหม่ที่ Deploy เสร็จแล้ว ⚠️⚠️⚠️
   const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyHL3J95N1Pz3-UjB2DsbYQcwETUKeSsDf_A_9UXf3Mcpfjb6EreFyK6KIKrgzhbytX/exec"; 
   
   let allSearchStudents = [];
@@ -336,11 +376,10 @@
       if(localStorage.getItem('room')) loadStudents();
     } catch(e) {
       console.error(e);
-      Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณาตรวจสอบ URL', 'error');
+      Swal.fire('การเชื่อมต่อล้มเหลว', 'ตรวจสอบ URL ของ Google Apps Script อีกครั้ง', 'error');
     }
   };
 
-  // Generic API Caller
   async function apiCall(action, params = {}) {
     const url = new URL(GAS_API_URL);
     url.searchParams.append('action', action);
@@ -350,7 +389,6 @@
     return await response.json();
   }
 
-  // POST API Caller (Bypass CORS Preflight using text/plain)
   async function apiPost(action, data) {
     const response = await fetch(GAS_API_URL, {
       method: 'POST',
@@ -360,7 +398,6 @@
     return await response.json();
   }
 
-  // UI Interactions
   function switchTab(viewId, btnId) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
     document.getElementById(viewId).classList.remove('hidden');
@@ -376,7 +413,6 @@
     document.getElementById('tab-' + tab + '-btn').classList.add('active');
   }
 
-  // Populate Dropdowns
   function populateDropdown(id, list, savedValue, placeholder = '-- เลือก --') {
     const el = document.getElementById(id);
     el.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
@@ -394,11 +430,11 @@
     const container = document.getElementById('studentContainer');
     const list = document.getElementById('studentList');
     container.classList.remove('hidden');
-    list.innerHTML = `<div class="text-center text-blue-500 py-6"><i class="bi bi-arrow-repeat animate-spin text-2xl"></i><p class="text-xs mt-2">กำลังโหลดรายชื่อ...</p></div>`;
+    list.innerHTML = `<div class="text-center py-8"><div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-2"></div><p class="text-xs text-gray-500 font-medium">กำลังโหลดรายชื่อ</p></div>`;
     
     try {
       const students = await apiCall('getStudentsByRoom', { room: room });
-      if(students.length === 0) { list.innerHTML = '<div class="text-center text-gray-400 py-4 text-sm">ไม่พบรายชื่อในห้องนี้</div>'; return; }
+      if(students.length === 0) { list.innerHTML = '<div class="text-center text-gray-400 py-6 text-sm">ไม่พบรายชื่อในห้องนี้</div>'; return; }
       
       let html = '';
       students.forEach((st, idx) => {
@@ -407,27 +443,27 @@
         const savedStatus = localStorage.getItem(`stat_${id}`) || 'รอดำเนินการ';
         
         html += `
-        <div class="py-4 px-2 student-row fade-in" style="animation-delay: ${idx*0.05}s">
-          <div class="font-bold text-sm text-gray-800 mb-2">${no}. ${name} <span class="text-xs font-normal text-gray-400">(${id})</span></div>
-          <div class="flex flex-wrap gap-1.5 mb-2">
+        <div class="py-4 px-3 student-row fade-in" style="animation-delay: ${idx*0.03}s">
+          <div class="font-bold text-sm text-gray-800 mb-2">${no}. ${name} <span class="text-xs font-normal text-gray-400 ml-1">รหัส ${id}</span></div>
+          <div class="flex flex-wrap gap-1.5 mb-3">
             <input type="radio" name="${cid}" id="pending_${cid}" value="รอดำเนินการ" class="hidden status-radio" onchange="localStorage.setItem('stat_${id}', this.value)" ${savedStatus==='รอดำเนินการ'?'checked':''}>
             
             <input type="radio" name="${cid}" id="p_${cid}" value="มาปกติ" class="hidden status-radio" onchange="localStorage.setItem('stat_${id}', this.value)" ${savedStatus==='มาปกติ'?'checked':''}>
-            <label for="p_${cid}" class="status-present cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-500 border border-transparent transition-all">ปกติ</label>
+            <label for="p_${cid}" class="status-present cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200 transition-all">ปกติ</label>
             
             <input type="radio" name="${cid}" id="l_${cid}" value="มาสาย" class="hidden status-radio" onchange="localStorage.setItem('stat_${id}', this.value)" ${savedStatus==='มาสาย'?'checked':''}>
-            <label for="l_${cid}" class="status-late cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-500 border border-transparent transition-all">สาย</label>
+            <label for="l_${cid}" class="status-late cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200 transition-all">สาย</label>
             
             <input type="radio" name="${cid}" id="s_${cid}" value="ลาป่วย" class="hidden status-radio" onchange="localStorage.setItem('stat_${id}', this.value)" ${savedStatus==='ลาป่วย'?'checked':''}>
-            <label for="s_${cid}" class="status-sick cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-500 border border-transparent transition-all">ป่วย</label>
+            <label for="s_${cid}" class="status-sick cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200 transition-all">ป่วย</label>
             
             <input type="radio" name="${cid}" id="lv_${cid}" value="ลากิจ" class="hidden status-radio" onchange="localStorage.setItem('stat_${id}', this.value)" ${savedStatus==='ลากิจ'?'checked':''}>
-            <label for="lv_${cid}" class="status-leave cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-500 border border-transparent transition-all">กิจ</label>
+            <label for="lv_${cid}" class="status-leave cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200 transition-all">กิจ</label>
             
             <input type="radio" name="${cid}" id="a_${cid}" value="ขาด" class="hidden status-radio" onchange="localStorage.setItem('stat_${id}', this.value)" ${savedStatus==='ขาด'?'checked':''}>
-            <label for="a_${cid}" class="status-absent cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-500 border border-transparent transition-all">ขาด</label>
+            <label for="a_${cid}" class="status-absent cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-500 border border-gray-200 transition-all">ขาด</label>
           </div>
-          <input type="text" class="stu-note w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-xs focus:bg-white focus:border-blue-300 outline-none transition-colors" placeholder="หมายเหตุ (ถ้ามี)" value="${localStorage.getItem(`note_${id}`)||''}" onkeyup="localStorage.setItem('note_${id}', this.value)">
+          <input type="text" class="stu-note w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-xs focus:bg-white focus:border-blue-300 outline-none transition-colors" placeholder="เพิ่มหมายเหตุ..." value="${localStorage.getItem(`note_${id}`)||''}" onkeyup="localStorage.setItem('note_${id}', this.value)">
           <input type="hidden" class="stu-id" value="${id}"><input type="hidden" class="stu-name" value="${name}">
         </div>`;
       });
@@ -436,7 +472,15 @@
   }
 
   function markAllPresent() {
-    Swal.fire({ title: 'เช็คมาปกติทุกคน?', icon: 'question', showCancelButton: true, confirmButtonColor: '#10b981', confirmButtonText: 'ใช่', cancelButtonText: 'ยกเลิก', borderRadius: '1rem' }).then((result) => {
+    Swal.fire({ 
+      title: 'เช็คมาปกติทุกคน?', 
+      icon: 'question', 
+      showCancelButton: true, 
+      confirmButtonColor: '#10b981', 
+      confirmButtonText: 'ใช่, ปกติทุกคน', 
+      cancelButtonText: 'ยกเลิก', 
+      borderRadius: '1.5rem' 
+    }).then((result) => {
       if (result.isConfirmed) {
         document.querySelectorAll('.student-row').forEach(row => {
           const id = row.querySelector('.stu-id').value;
@@ -467,18 +511,18 @@
 
     if (data.length === 0) { Swal.fire('แจ้งเตือน', 'กรุณาเลือกสถานะอย่างน้อย 1 คน', 'warning'); return; }
     
-    btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin mr-1"></i> กำลังบันทึก...';
+    btn.disabled = true; btn.innerHTML = '<div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div> กำลังบันทึก...';
     try {
       const res = await apiPost('saveAttendance', { data: data });
       if(res.status === 'success') {
         Swal.fire({title: 'สำเร็จ!', text: res.message, icon: 'success', timer: 2000, showConfirmButton: false});
-        localStorage.clear(); // Clear cached statuses
+        localStorage.clear();
         localStorage.setItem('teacher', document.getElementById('teacherSelect').value);
         localStorage.setItem('room', document.getElementById('roomSelect').value);
         loadStudents();
       } else { throw new Error(res.error || 'Unknown error'); }
     } catch(e) { Swal.fire('ผิดพลาด', e.message, 'error'); }
-    finally { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill mr-1"></i> บันทึกข้อมูล'; }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill mr-2 text-xl"></i> บันทึกข้อมูล'; }
   });
 
   async function loadPublicDashboard() {
@@ -497,7 +541,7 @@
   function renderDashboard(payload) {
     const acc = document.getElementById('gradeAccordion');
     if (Object.keys(payload.grades).length === 0) {
-      acc.innerHTML = '<div class="text-center text-gray-400 py-10"><i class="bi bi-inbox text-4xl block mb-2"></i>ยังไม่มีใครบันทึกเช็คชื่อวันนี้</div>';
+      acc.innerHTML = '<div class="text-center text-gray-400 py-10"><i class="bi bi-box2 text-5xl block mb-3 opacity-50"></i><p class="font-medium">ยังไม่มีใครบันทึกเช็คชื่อวันนี้</p></div>';
       return;
     }
 
@@ -506,38 +550,37 @@
       const d = payload.grades[grade];
       const pct = d.total > 0 ? Math.round(((d.present + d.late) / d.total) * 100) : 0;
       html += `
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-3">
-        <button class="w-full px-4 py-3 flex justify-between items-center bg-gray-50/50" onclick="this.nextElementSibling.classList.toggle('hidden')">
-          <span class="font-bold text-gray-700">${grade}</span>
-          <span class="text-xs px-2 py-1 rounded-full ${pct>=80?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'} font-semibold">${pct}% มาเรียน</span>
+      <div class="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+        <button class="w-full px-5 py-4 flex justify-between items-center active:bg-gray-50 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">
+          <span class="font-bold text-lg text-gray-800">${grade}</span>
+          <span class="text-xs px-3 py-1.5 rounded-full ${pct>=80?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'} font-bold tracking-wide">${pct}% มาเรียน</span>
         </button>
-        <div class="hidden px-4 py-3 border-t border-gray-50">
-          <div class="grid grid-cols-3 gap-2 text-center mb-3">
-            <div class="bg-green-50 rounded-xl p-2"><div class="text-[0.6rem] text-green-600 font-bold">ปกติ</div><div class="text-lg font-bold">${d.present}</div></div>
-            <div class="bg-yellow-50 rounded-xl p-2"><div class="text-[0.6rem] text-yellow-600 font-bold">สาย/ป่วย</div><div class="text-lg font-bold">${d.late+d.sick}</div></div>
-            <div class="bg-red-50 rounded-xl p-2"><div class="text-[0.6rem] text-red-600 font-bold">กิจ/ขาด</div><div class="text-lg font-bold">${d.leave+d.absent}</div></div>
+        <div class="hidden px-5 py-4 border-t border-gray-50 bg-gray-50/30">
+          <div class="grid grid-cols-3 gap-2 text-center mb-4">
+            <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100"><div class="text-[0.65rem] text-green-500 font-bold uppercase mb-1">ปกติ</div><div class="text-xl font-bold text-gray-800">${d.present}</div></div>
+            <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100"><div class="text-[0.65rem] text-yellow-500 font-bold uppercase mb-1">สาย/ป่วย</div><div class="text-xl font-bold text-gray-800">${d.late+d.sick}</div></div>
+            <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100"><div class="text-[0.65rem] text-red-500 font-bold uppercase mb-1">กิจ/ขาด</div><div class="text-xl font-bold text-gray-800">${d.leave+d.absent}</div></div>
           </div>
-          ${generateNameList(d.lateList, 'text-yellow-600', 'bg-yellow-50')}
-          ${generateNameList(d.sickList, 'text-orange-600', 'bg-orange-50')}
-          ${generateNameList(d.leaveList, 'text-blue-600', 'bg-blue-50')}
-          ${generateNameList(d.absentList, 'text-red-600', 'bg-red-50')}
+          ${generateNameList(d.lateList, 'text-yellow-600', 'bg-yellow-100')}
+          ${generateNameList(d.sickList, 'text-blue-600', 'bg-blue-100')}
+          ${generateNameList(d.leaveList, 'text-indigo-600', 'bg-indigo-100')}
+          ${generateNameList(d.absentList, 'text-red-600', 'bg-red-100')}
         </div>
       </div>`;
     }
     
-    // Missing Section
     if (payload.missing && payload.missing.total > 0) {
       let mHtml = '';
       Object.keys(payload.missing.rooms).sort().forEach(r => {
-        mHtml += `<div class="mb-2"><span class="font-bold text-sm">ม.${r}</span><span class="text-xs text-gray-500 ml-2">(${payload.missing.rooms[r].length} คน)</span></div>`;
+        mHtml += `<div class="mb-2 bg-white p-2 rounded-lg shadow-sm border border-red-50"><span class="font-bold text-sm text-red-800 ml-1">ม.${r}</span><span class="text-xs text-red-500 ml-2 font-medium">(${payload.missing.rooms[r].length} คน)</span></div>`;
       });
       html += `
-      <div class="bg-red-50 rounded-2xl border border-red-100 shadow-sm overflow-hidden mt-4">
-        <button class="w-full px-4 py-3 flex justify-between items-center" onclick="this.nextElementSibling.classList.toggle('hidden')">
-          <span class="font-bold text-red-600"><i class="bi bi-exclamation-triangle-fill mr-1"></i> ขาดเช็คชื่อ</span>
-          <span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 font-semibold">${payload.missing.total} คน</span>
+      <div class="bg-red-50 rounded-[24px] border border-red-100 shadow-sm overflow-hidden mt-4">
+        <button class="w-full px-5 py-4 flex justify-between items-center active:bg-red-100 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">
+          <span class="font-bold text-red-600"><i class="bi bi-exclamation-octagon-fill mr-2"></i>รายชื่อตกหล่น</span>
+          <span class="text-xs px-3 py-1.5 rounded-full bg-red-200 text-red-800 font-bold">${payload.missing.total} คน</span>
         </button>
-        <div class="hidden px-4 py-3 border-t border-red-100 text-red-800 text-xs">
+        <div class="hidden px-5 py-4 border-t border-red-100">
           ${mHtml}
         </div>
       </div>`;
@@ -547,8 +590,8 @@
 
   function generateNameList(list, colorText, colorBg) {
     if(!list || list.length === 0) return '';
-    const items = list.map(item => `<span onclick="openStudentModal('${item.id}')" class="inline-block ${colorBg} ${colorText} px-2 py-1 rounded-lg text-[0.7rem] mr-1 mb-1 cursor-pointer hover:opacity-80 active:scale-95 transition-transform">${item.name} <span class="opacity-50">(${item.room})</span></span>`).join('');
-    return `<div class="mb-2">${items}</div>`;
+    const items = list.map(item => `<span onclick="openStudentModal('${item.id}')" class="inline-block ${colorBg} ${colorText} px-2.5 py-1.5 rounded-xl text-[0.75rem] font-medium mr-1.5 mb-1.5 cursor-pointer hover:opacity-70 active:scale-90 transition-all shadow-sm">${item.name} <span class="opacity-60 ml-0.5">${item.room}</span></span>`).join('');
+    return `<div class="mb-3">${items}</div>`;
   }
 
   function filterStudentsForSearch() {
@@ -559,7 +602,7 @@
     if(room) filtered = allSearchStudents.filter(s => s.room === room);
     filtered.forEach(s => {
       const opt = document.createElement('option');
-      opt.value = s.id; opt.textContent = `[ม.${s.room}] ${s.name}`;
+      opt.value = s.id; opt.textContent = `ม.${s.room} - ${s.name}`;
       el.appendChild(opt);
     });
   }
@@ -577,38 +620,54 @@
     if(!val) { Swal.fire('แจ้งเตือน', 'กรุณาเลือกข้อมูลที่ต้องการค้นหา', 'warning'); return; }
 
     const btn = document.getElementById('searchBtn');
-    btn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin mr-1"></i> ค้นหา...'; btn.disabled = true;
+    btn.innerHTML = '<div class="w-5 h-5 border-2 border-blue-700 border-t-transparent rounded-full animate-spin inline-block align-middle mr-2"></div> ค้นหา...'; 
+    btn.disabled = true;
     document.getElementById('historyResultContainer').classList.remove('hidden');
-    const tbody = document.getElementById('historyTableBody');
-    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">กำลังโหลด...</td></tr>';
+    const tbody = document.getElementById('historyListBody');
+    tbody.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">กำลังโหลดข้อมูล...</div>';
 
     try {
       const res = await apiCall('getHistory', { type: type, val: val });
-      if(res.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">ไม่พบประวัติ</td></tr>'; }
+      if(res.length === 0) { tbody.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">ไม่พบประวัติการเช็คชื่อ</div>'; }
       else {
-        tbody.innerHTML = res.map(r => {
-          let badge = `<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md text-[0.6rem]">${r[5]}</span>`;
-          if(r[5]==='มาปกติ') badge = `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-[0.6rem]">ปกติ</span>`;
-          else if(r[5]==='ขาด') badge = `<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-md text-[0.6rem]">ขาด</span>`;
-          else if(r[5]==='มาสาย') badge = `<span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-md text-[0.6rem]">สาย</span>`;
+        // Upgrade from Table to Mobile-friendly Card List
+        tbody.innerHTML = res.map((r, idx) => {
+          let badgeColor = 'bg-gray-100 text-gray-600';
+          if(r[5]==='มาปกติ') badgeColor = 'bg-green-100 text-green-700';
+          else if(r[5]==='ขาด') badgeColor = 'bg-red-100 text-red-700';
+          else if(r[5]==='มาสาย') badgeColor = 'bg-yellow-100 text-yellow-700';
+          else if(r[5]==='ลาป่วย' || r[5]==='ลากิจ') badgeColor = 'bg-blue-100 text-blue-700';
           
-          return `<tr onclick="openStudentModal('${r[2]}')" class="cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors">
-            <td class="py-2 px-3 text-gray-500">${r[0].substring(0,5)}<br><span class="text-[0.6rem] opacity-70">${r[1].substring(0,5)}</span></td>
-            <td class="py-2 px-3"><div class="font-bold text-gray-700 text-[0.75rem] truncate max-w-[120px]">${r[3]}</div></td>
-            <td class="py-2 px-3 text-center">${badge}</td>
-          </tr>`;
+          return `
+          <div onclick="openStudentModal('${r[2]}')" class="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-50 flex items-center justify-between cursor-pointer active-scale fade-in" style="animation-delay: ${idx*0.02}s">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-gray-50 flex flex-col items-center justify-center mr-3 border border-gray-100">
+                <span class="text-[0.65rem] font-bold text-gray-400 leading-none">${r[0].substring(0,5)}</span>
+              </div>
+              <div>
+                <div class="font-bold text-gray-800 text-sm max-w-[150px] truncate">${r[3]}</div>
+                <div class="text-[0.7rem] text-gray-400 mt-0.5"><i class="bi bi-clock mr-1"></i>${r[1].substring(0,5)} <span class="ml-2">ม.${r[4]}</span></div>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-[0.7rem] font-bold ${badgeColor}">${r[5]}</span>
+          </div>`;
         }).join('');
       }
       document.getElementById('historyTitle').innerText = `พบ ${res.length} รายการ`;
-    } catch(e) { tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-500">ผิดพลาด</td></tr>'; }
-    finally { btn.innerHTML = '<i class="bi bi-search mr-1"></i> ค้นหาประวัติ'; btn.disabled = false; }
+    } catch(e) { tbody.innerHTML = '<div class="text-center py-6 text-red-500 text-sm">เกิดข้อผิดพลาด</div>'; }
+    finally { btn.innerHTML = '<i class="bi bi-search mr-1"></i> ดูประวัติ'; btn.disabled = false; }
   }
 
-  // 🌟 New Feature: Open Individual Student Profile
+  // 🌟 Ultimate Student Profile Modal
   async function openStudentModal(studentId) {
-    document.getElementById('studentModal').classList.remove('modal-closed');
-    document.getElementById('studentModal').classList.add('modal-open');
-    document.getElementById('modalOverlay').classList.remove('hidden');
+    const modal = document.getElementById('studentModal');
+    const overlay = document.getElementById('modalOverlay');
+    
+    modal.classList.remove('modal-closed');
+    modal.classList.add('modal-open');
+    overlay.classList.remove('hidden');
+    // Slight delay to trigger CSS transition for opacity
+    setTimeout(() => overlay.classList.add('opacity-100'), 10);
     
     document.getElementById('modalData').classList.add('hidden');
     document.getElementById('modalLoading').classList.remove('hidden');
@@ -621,8 +680,14 @@
       document.getElementById('mod-room').innerText = res.info.room;
       
       document.getElementById('mod-percent').innerText = res.percentage + '%';
-      document.getElementById('mod-bar').style.width = res.percentage + '%';
-      document.getElementById('mod-bar').className = `h-2.5 rounded-full ${res.percentage >= 80 ? 'bg-green-500' : 'bg-yellow-500'}`;
+      
+      // Reset bar width for animation
+      const bar = document.getElementById('mod-bar');
+      bar.style.width = '0%';
+      bar.className = `h-3 rounded-full transition-all duration-1000 ease-out ${res.percentage >= 80 ? 'bg-green-500' : (res.percentage >= 60 ? 'bg-yellow-400' : 'bg-red-500')}`;
+      // Trigger reflow
+      void bar.offsetWidth;
+      bar.style.width = res.percentage + '%';
 
       document.getElementById('mod-p').innerText = res.stats.present;
       document.getElementById('mod-l').innerText = res.stats.late;
@@ -631,15 +696,26 @@
 
       const ul = document.getElementById('mod-history');
       if(res.history.length === 0) {
-        ul.innerHTML = '<li class="py-3 text-center text-gray-400 text-xs">ไม่มีข้อมูลย้อนหลัง</li>';
+        ul.innerHTML = '<li class="py-5 text-center text-gray-400 text-sm">ไม่มีข้อมูลย้อนหลัง</li>';
       } else {
         ul.innerHTML = res.history.map(h => {
-          let dot = 'bg-gray-300';
-          if(h.status==='มาปกติ') dot='bg-green-500';
-          else if(h.status==='มาสาย') dot='bg-yellow-500';
-          else if(h.status==='ขาด') dot='bg-red-500';
-          else dot='bg-blue-500';
-          return `<li class="py-2 px-3 flex justify-between items-center"><div class="flex items-center"><div class="w-2 h-2 rounded-full ${dot} mr-2"></div><span class="font-medium text-gray-700">${h.date}</span></div><span class="text-gray-500 text-xs">${h.status} ${h.note ? `(${h.note})`:''}</span></li>`;
+          let dotColor = 'bg-gray-300'; let textColor = 'text-gray-500';
+          if(h.status==='มาปกติ') { dotColor='bg-green-500'; textColor='text-green-600'; }
+          else if(h.status==='มาสาย') { dotColor='bg-yellow-400'; textColor='text-yellow-600'; }
+          else if(h.status==='ขาด') { dotColor='bg-red-500'; textColor='text-red-600'; }
+          else { dotColor='bg-blue-500'; textColor='text-blue-600'; }
+          
+          return `
+          <li class="py-3 px-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
+            <div class="flex items-center">
+              <div class="w-2.5 h-2.5 rounded-full ${dotColor} mr-3 shadow-sm"></div>
+              <span class="font-bold text-gray-700 text-sm">${h.date}</span>
+            </div>
+            <div class="text-right">
+              <span class="${textColor} font-bold text-xs bg-white px-2 py-1 rounded-md shadow-sm border border-gray-50">${h.status}</span>
+              ${h.note ? `<div class="text-[0.65rem] text-gray-400 mt-1 max-w-[100px] truncate">${h.note}</div>`:''}
+            </div>
+          </li>`;
         }).join('');
       }
 
@@ -647,18 +723,31 @@
       document.getElementById('modalData').classList.remove('hidden');
       document.getElementById('modalData').classList.add('fade-in');
     } catch(e) {
-      document.getElementById('modalLoading').innerHTML = '<div class="text-red-500">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+      document.getElementById('modalLoading').innerHTML = '<div class="text-red-500 text-sm"><i class="bi bi-exclamation-triangle block text-3xl mb-2"></i>เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
     }
   }
 
   function closeStudentModal() {
-    document.getElementById('studentModal').classList.remove('modal-open');
-    document.getElementById('studentModal').classList.add('modal-closed');
-    document.getElementById('modalOverlay').classList.add('hidden');
+    const modal = document.getElementById('studentModal');
+    const overlay = document.getElementById('modalOverlay');
+    
+    modal.classList.remove('modal-open');
+    modal.classList.add('modal-closed');
+    overlay.classList.remove('opacity-100');
+    setTimeout(() => overlay.classList.add('hidden'), 300); // Wait for fade out
   }
 
   function promptAdminPin() {
-    Swal.fire({ title: 'รหัสผู้บริหาร', input: 'password', inputAttributes: { inputmode: 'numeric', pattern: '[0-9]*' }, showCancelButton: true, confirmButtonText: 'เข้าสู่ระบบ', confirmButtonColor: '#007AFF', borderRadius: '1rem' }).then(async (result) => {
+    Swal.fire({ 
+      title: 'รหัสผ่านผู้บริหาร', 
+      input: 'password', 
+      inputAttributes: { inputmode: 'numeric', pattern: '[0-9]*' }, 
+      showCancelButton: true, 
+      confirmButtonText: 'เข้าสู่ระบบ', 
+      confirmButtonColor: '#000000', 
+      borderRadius: '1.5rem',
+      customClass: { confirmButton: 'rounded-xl px-5', cancelButton: 'rounded-xl px-5' }
+    }).then(async (result) => {
       if (result.isConfirmed) {
         Swal.fire({title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
         try {
@@ -668,7 +757,7 @@
             switchTab('view-admin', 'nav-admin'); 
             loadAdminDashboard(); 
           } else { 
-            Swal.fire('ผิดพลาด', 'รหัส PIN ไม่ถูกต้อง', 'error'); 
+            Swal.fire('รหัสไม่ถูกต้อง', 'กรุณาลองใหม่อีกครั้ง', 'error'); 
             document.getElementById('nav-checkin').click(); 
           }
         } catch(e) { Swal.fire('Error', e.message, 'error'); }
@@ -685,7 +774,6 @@
         apiCall('getAdminEval')
       ]);
 
-      // Populate Today
       document.getElementById('ad-total').textContent = todayData.total;
       document.getElementById('ad-present').textContent = todayData.present;
       document.getElementById('ad-late').textContent = todayData.late;
@@ -693,18 +781,20 @@
       document.getElementById('ad-leave').textContent = todayData.leave;
       document.getElementById('ad-absent').textContent = todayData.absent;
 
-      // Populate Eval
       const eCont = document.getElementById('teacherEvalContainer');
       eCont.innerHTML = '';
       evalData.teacherStats.forEach(stat => {
         let color = stat.pct >= 90 ? 'bg-green-500' : (stat.pct >= 70 ? 'bg-yellow-500' : 'bg-red-500');
         eCont.innerHTML += `
-        <div class="bg-white p-3 rounded-2xl border border-gray-50 shadow-sm">
-          <div class="flex justify-between items-center mb-2">
-            <span class="font-bold text-sm text-gray-700">ม.${stat.room} <span class="font-normal text-xs text-gray-400">(${stat.teachers})</span></span>
-            <span class="font-bold text-sm ${color.replace('bg-', 'text-')}">${stat.pct}%</span>
+        <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <span class="font-bold text-gray-800">ม.${stat.room}</span> 
+              <span class="block font-medium text-xs text-gray-400 mt-0.5">${stat.teachers}</span>
+            </div>
+            <span class="font-bold text-lg ${color.replace('bg-', 'text-')}">${stat.pct}%</span>
           </div>
-          <div class="w-full bg-gray-100 rounded-full h-1.5"><div class="${color} h-1.5 rounded-full" style="width: ${stat.pct}%"></div></div>
+          <div class="w-full bg-gray-100 rounded-full h-2"><div class="${color} h-2 rounded-full" style="width: ${stat.pct}%"></div></div>
         </div>`;
       });
       
@@ -716,14 +806,24 @@
   }
 
   async function confirmDataToLine() {
-    Swal.fire({ title: 'ยืนยันยอดวันนี้?', text: "ระบบจะแจ้งเตือนผู้ปกครองทาง LINE ว่าเช็คชื่อเสร็จแล้ว", icon: 'warning', showCancelButton: true, confirmButtonColor: '#10b981', confirmButtonText: 'ยืนยัน', cancelButtonText: 'ยกเลิก' }).then(async (result) => {
+    Swal.fire({ 
+      title: 'ยืนยันยอดวันนี้?', 
+      text: "ระบบจะแจ้งเตือนผู้ปกครองทาง LINE ว่าเช็คชื่อเสร็จแล้ว", 
+      icon: 'warning', 
+      showCancelButton: true, 
+      confirmButtonColor: '#06C755', // LINE Green
+      confirmButtonText: 'ยืนยันส่งข้อมูล', 
+      cancelButtonText: 'ยกเลิก',
+      borderRadius: '1.5rem'
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const btn = document.getElementById('confirmLineBtn'); btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin mr-2"></i> กำลังส่งคำสั่ง...';
+        const btn = document.getElementById('confirmLineBtn'); btn.disabled = true; 
+        btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div> กำลังเชื่อมต่อ...';
         try {
           const res = await apiPost('confirmDataAdmin', {});
-          if(res.status === 'success') Swal.fire('สำเร็จ', res.message, 'success');
+          if(res.status === 'success') Swal.fire('ส่งข้อมูลสำเร็จ', res.message, 'success');
         } catch(e) { Swal.fire('ผิดพลาด', e.message, 'error'); }
-        finally { btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-circle-fill mr-2"></i> ยืนยันยอดลงระบบ LINE ผู้ปกครอง'; }
+        finally { btn.disabled = false; btn.innerHTML = '<i class="bi bi-line mr-2"></i> ยืนยันยอดเข้า LINE'; }
       }
     });
   }
