@@ -350,32 +350,32 @@
                     for(let i=0; i<colC; i++) html += createTableCard(tableDataMap.get(`T${tNum++}`));
                 };
 
-                // --- Section 1 (แถว 1-7 รวม 49 โต๊ะ) ---
-                for(let r=0; r<7; r++) addRow(2, 3, 2);
+                // --- Section 1 (เปลี่ยนเป็น 8 แถว = 56 โต๊ะ) ---
+                for(let r=0; r<8; r++) addRow(2, 3, 2);
 
                 // --- ทางเดินขวางที่ 1 + เวทีดนตรี ---
                 html += `<div class="aisle-h" style="grid-column: 1 / span 3;"></div>`;
                 html += `<div class="music-console" style="grid-column: 4 / span 3;">🎵 Music Console</div>`;
                 html += `<div class="aisle-h" style="grid-column: 7 / span 3;"></div>`;
 
-                // --- Section 2 (แถว 8-14 รวม 49 โต๊ะ) ---
+                // --- Section 2 (เปลี่ยนเป็น 8 แถว = 56 โต๊ะ) ---
                 // เพิ่มป้าย Cooking Zone บอกตำแหน่ง
                 html += `<div class="cooking-badge">🍳 โซนทำอาหารอยู่ด้านซ้ายมือ</div>`;
                 html += `<div style="grid-column: 4 / -1;"></div>`; // เว้นว่างขวา
                 
-                for(let r=0; r<7; r++) addRow(2, 3, 2);
+                for(let r=0; r<8; r++) addRow(2, 3, 2);
 
                 // --- ทางเดินขวางที่ 2 ---
                 html += `<div class="aisle-h"></div>`;
 
-                // --- Section 3 (แถว 15-21 รวม 49 โต๊ะ) ---
-                for(let r=0; r<7; r++) addRow(2, 3, 2);
+                // --- Section 3 (เปลี่ยนเป็น 5 แถว = 35 โต๊ะ) ---
+                for(let r=0; r<5; r++) addRow(2, 3, 2);
 
-                // --- Section 3 ติ่งสุดท้าย (แถว 22 มีแค่ 3 โต๊ะตรงกลาง รวมเป็น 52 โต๊ะของโซนนี้) ---
+                // --- Section 3 ติ่งสุดท้าย (แถวสุดท้าย 3 โต๊ะตรงกลาง รวมทั้งหมดจะได้ 150 โต๊ะพอดี) ---
                 html += `<div></div><div></div> <div class="aisle-v"></div>`; // A ว่าง
                 html += createTableCard(tableDataMap.get(`T${tNum++}`));
                 html += createTableCard(tableDataMap.get(`T${tNum++}`));
-                html += createTableCard(tableDataMap.get(`T${tNum++}`)); // B 3 โต๊ะ (โต๊ะ 148, 149, 150)
+                html += createTableCard(tableDataMap.get(`T${tNum++}`)); // B 3 โต๊ะ
                 html += `<div class="aisle-v"></div> <div></div><div></div>`; // C ว่าง
 
                 document.getElementById('grid').innerHTML = html;
