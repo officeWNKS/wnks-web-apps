@@ -99,7 +99,7 @@
     <script>
         // =========================================================================
         // ⚠️ สำคัญมาก: นำ URL ของ Web App ที่ได้จาก Google Apps Script มาใส่ตรงนี้
-        const GAS_URL = 'ใส่_URL_WEB_APP_ของคุณที่นี่';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxft_a6QFLAu5GXeLfFyuyAHvm4CuLIh3rP3uJNEer3YwBgdTGEZWtBh4rkjpxVMJRZvA/exec';
         // =========================================================================
 
         let allSubjects = [];
@@ -110,13 +110,12 @@
 
         // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
         window.onload = async function() {
-            if(GAS_URL === 'https://script.google.com/macros/s/AKfycbxft_a6QFLAu5GXeLfFyuyAHvm4CuLIh3rP3uJNEer3YwBgdTGEZWtBh4rkjpxVMJRZvA/exec') {
-                alert('โปรดแก้ไขไฟล์ HTML เพื่อใส่ GAS URL ก่อนใช้งาน');
-                return;
-            }
-
             try {
-                const response = await fetch(GAS_URL);
+                // แก้ไข 1: เพิ่ม redirect: 'follow' เพื่อให้ Browser ตาม Google ไปดึงข้อมูลได้
+                const response = await fetch(GAS_URL, {
+                    method: 'GET',
+                    redirect: 'follow' 
+                });
                 const data = await response.json();
                 
                 if(data.status === 'success') {
@@ -253,10 +252,14 @@
 
             // ส่งข้อมูลไปที่ Google Apps Script
             try {
+                // แก้ไข 2: เพิ่ม Headers เป็น text/plain เพื่อเลี่ยงการถูกบล็อก CORS Preflight ของ Browser
                 const response = await fetch(GAS_URL, {
                     method: 'POST',
+                    redirect: 'follow',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
                     body: JSON.stringify({ records: records })
-                    // ไม่ต้องใส่ headers 'Content-Type' เพราะ GAS จัดการ payload ที่เป็น string ได้เลยและลดปัญหา CORS
                 });
                 
                 const result = await response.json();
