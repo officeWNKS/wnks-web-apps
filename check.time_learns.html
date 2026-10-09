@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเช็คชื่อเข้าเรียน - โรงเรียนวังน้ำคู้ศึกษา</title>
+    <!-- เรียกใช้ Tailwind CSS เพื่อความสวยงาม -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-blue-700">ระบบเช็คชื่อเข้าเรียน (รายวิชา)</h1>
+            <p class="text-gray-600 mt-2">โรงเรียนวังน้ำคู้ศึกษา</p>
+        </div>
+
+        <!-- หน้าต่างโหลดข้อมูล -->
+        <div id="loading" class="flex flex-col items-center justify-center py-10">
+            <div class="loader mb-4"></div>
+            <p class="text-gray-500">กำลังเชื่อมต่อฐานข้อมูล...</p>
+        </div>
+
+        <!-- ฟอร์มหลัก (ซ่อนไว้ก่อนจนกว่าจะโหลดเสร็จ) -->
+        <div id="main-content" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-blue-50 p-4 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">วันที่</label>
+                    <input type="date" id="attendance-date" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">คาบเรียนที่</label>
+                    <select id="attendance-period" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">-- เลือกคาบเรียน --</option>
+                        <option value="1">คาบ 1</option>
+                        <option value="2">คาบ 2</option>
+                        <option value="3">คาบ 3</option>
+                        <option value="4">คาบ 4</option>
+                        <option value="5">คาบ 5</option>
+                        <option value="6">คาบ 6</option>
+                        <option value="7">คาบ 7</option>
+                        <option value="8">คาบ 8</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รายวิชา</label>
+                    <select id="subject-select" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">-- เลือกรายวิชา --</option>
+                        <!-- ข้อมูลวิชาจะถูกเพิ่มด้วย JavaScript -->
+                    </select>
+                </div>
+            </div>
+
+            <div id="student-list-container" class="hidden">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">รายชื่อนักเรียน <span id="room-display" class="text-blue-600"></span></h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัส</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ-นามสกุล</th>
+                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะการเข้าเรียน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- รายชื่อนักเรียนจะแสดงที่นี่ -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button id="submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200">
+                        บันทึกการเช็คชื่อ
+                    </button>
+                </div>
+            </div>
+            
+            <!-- แจ้งเตือนเมื่อไม่พบนักเรียน -->
+            <div id="no-student-alert" class="hidden text-center py-8 text-red-500 bg-red-50 rounded-lg mt-4">
+                ไม่พบข้อมูลนักเรียนในห้องที่ระบุสำหรับวิชานี้ โปรดตรวจสอบ Sheet: Subjects และ Students
+            </div>
+        </div>
+    </div>
+
+    <!-- แจ้งเตือน Popup -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 text-white px-6 py-3 rounded shadow-lg z-50"></div>
+
+    <script>
+        // =========================================================================
+        // ⚠️ สำคัญมาก: นำ URL ของ Web App ที่ได้จาก Google Apps Script มาใส่ตรงนี้
+        const GAS_URL = 'ใส่_URL_WEB_APP_ของคุณที่นี่';
+        // =========================================================================
+
+        let allSubjects = [];
+        let allStudents = [];
+
+        // กำหนดวันที่ปัจจุบันเป็นค่าเริ่มต้น
+        document.getElementById('attendance-date').valueAsDate = new Date();
+
+        // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
+        window.onload = async function() {
+            if(GAS_URL === 'https://script.google.com/macros/s/AKfycbxft_a6QFLAu5GXeLfFyuyAHvm4CuLIh3rP3uJNEer3YwBgdTGEZWtBh4rkjpxVMJRZvA/exec') {
+                alert('โปรดแก้ไขไฟล์ HTML เพื่อใส่ GAS URL ก่อนใช้งาน');
+                return;
+            }
+
+            try {
+                const response = await fetch(GAS_URL);
+                const data = await response.json();
+                
+                if(data.status === 'success') {
+                    allSubjects = data.subjects;
+                    allStudents = data.students;
+                    
+                    populateSubjects();
+                    
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับ Google Sheet');
+            }
+        };
+
+        // สร้าง Dropdown รายวิชา
+        function populateSubjects() {
+            const select = document.getElementById('subject-select');
+            allSubjects.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.subject_id;
+                option.textContent = `${sub.subject_id} - ${sub.subject_name} (${sub.teacher})`;
+                // เก็บข้อมูลห้องเป้าหมายไว้ใน attribute
+                option.dataset.room = sub.target_room; 
+                select.appendChild(option);
+            });
+        }
+
+        // เมื่อเลือกวิชา ให้ดึงเด็กนักเรียนในห้องนั้นมาแสดง
+        document.getElementById('subject-select').addEventListener('change', function(e) {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const targetRoom = selectedOption.dataset.room;
+            
+            if(!e.target.value) {
+                document.getElementById('student-list-container').classList.add('hidden');
+                document.getElementById('no-student-alert').classList.add('hidden');
+                return;
+            }
+
+            // กรองนักเรียนเฉพาะห้องที่เรียนวิชานี้
+            const filteredStudents = allStudents.filter(student => student.room === targetRoom);
+            
+            const tbody = document.getElementById('student-table-body');
+            tbody.innerHTML = '';
+
+            if(filteredStudents.length > 0) {
+                document.getElementById('room-display').textContent = `(ชั้น ${targetRoom})`;
+                
+                filteredStudents.forEach(student => {
+                    const tr = document.createElement('tr');
+                    tr.className = "student-row hover:bg-gray-50 transition-colors";
+                    tr.dataset.studentid = student.student_id;
+                    
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.student_id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                            <div class="flex justify-center space-x-4">
+                                <label class="flex items-center text-green-600 cursor-pointer">
+                                    <input type="radio" name="status_${student.student_id}" value="มา" checked class="mr-1 w-4 h-4 text-green-600 focus:ring-green-500"> มา
+                                </label>
+                                <label class="flex items-center text-red-500 cursor-pointer">
+                                    <input type="radio" name="status_${student.student_id}" value="ขาด" class="mr-1 w-4 h-4 text-red-500 focus:ring-red-500"> ขาด
+                                </label>
+                                <label class="flex items-center text-yellow-500 cursor-pointer">
+                                    <input type="radio" name="status_${student.student_id}" value="ลา" class="mr-1 w-4 h-4 text-yellow-500 focus:ring-yellow-500"> ลา
+                                </label>
+                                <label class="flex items-center text-orange-500 cursor-pointer">
+                                    <input type="radio" name="status_${student.student_id}" value="สาย" class="mr-1 w-4 h-4 text-orange-500 focus:ring-orange-500"> สาย
+                                </label>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                document.getElementById('no-student-alert').classList.add('hidden');
+                document.getElementById('student-list-container').classList.remove('hidden');
+            } else {
+                document.getElementById('student-list-container').classList.add('hidden');
+                document.getElementById('no-student-alert').classList.remove('hidden');
+            }
+        });
+
+        // ฟังก์ชันสำหรับแจ้งเตือน
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `fixed bottom-5 right-5 transform transition-all duration-300 text-white px-6 py-3 rounded shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // เมื่อกดบันทึก
+        document.getElementById('submit-btn').addEventListener('click', async function() {
+            const date = document.getElementById('attendance-date').value;
+            const period = document.getElementById('attendance-period').value;
+            const subjectId = document.getElementById('subject-select').value;
+            
+            if(!date || !period || !subjectId) {
+                showToast('กรุณากรอก วันที่, คาบเรียน และรายวิชา ให้ครบถ้วน', 'error');
+                return;
+            }
+
+            // เปลี่ยนปุ่มเป็นสถานะกำลังโหลด
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loader inline-block w-4 h-4 border-2 mr-2"></span> กำลังบันทึก...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            // รวบรวมข้อมูลการเช็คชื่อ
+            const records = [];
+            const studentRows = document.querySelectorAll('.student-row');
+            
+            studentRows.forEach(row => {
+                const studentId = row.dataset.studentid;
+                const statusElement = document.querySelector(`input[name="status_${studentId}"]:checked`);
+                const status = statusElement ? statusElement.value : 'มา';
+                
+                records.push({
+                    date: date,
+                    period: period,
+                    subject_id: subjectId,
+                    student_id: studentId,
+                    status: status
+                });
+            });
+
+            // ส่งข้อมูลไปที่ Google Apps Script
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ records: records })
+                    // ไม่ต้องใส่ headers 'Content-Type' เพราะ GAS จัดการ payload ที่เป็น string ได้เลยและลดปัญหา CORS
+                });
+                
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
+                    // ล้างค่าฟอร์มบางส่วน
+                    document.getElementById('subject-select').value = "";
+                    document.getElementById('student-list-container').classList.add('hidden');
+                } else {
+                    showToast('เกิดข้อผิดพลาด: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showToast('เกิดข้อผิดพลาดในการส่งข้อมูล', 'error');
+            } finally {
+                // คืนค่าปุ่มกลับมาเหมือนเดิม
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        });
+    </script>
+</body>
+</html>
