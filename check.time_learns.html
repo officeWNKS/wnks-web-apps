@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบเช็คชื่อ - ร.ร.วังน้ำคู้ศึกษา</title>
+    <title>ระบบเช็คชื่อรายวิชา ร.ร.วังน้ำคู้ศึกษา</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- กำหนดโทนสี กรม-ทอง ผ่าน Tailwind Config -->
     <script>
@@ -35,26 +35,35 @@
         /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* เพิ่ม Animation ให้ตอนโหลดข้อมูลดูนุ่มนวล */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 antialiased">
 
-    <!-- Header Section (สีกรม) -->
-    <div class="bg-navy-900 rounded-b-[2rem] shadow-lg px-6 pt-10 pb-16 relative">
+    <!-- Header Section (สีกรมไล่เฉดสี) -->
+    <div class="bg-gradient-to-b from-navy-900 to-navy-800 rounded-b-[2.5rem] shadow-lg px-6 pt-12 pb-24 relative z-0">
         <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-2xl md:text-3xl font-bold text-gold-500 tracking-wide">ระบบเช็คชื่อเข้าเรียน</h1>
-            <p class="text-gray-300 mt-2 text-sm font-light tracking-wider">โรงเรียนวังน้ำคู้ศึกษา</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-gold-500 tracking-wide drop-shadow-sm">ระบบเช็คชื่อเข้าเรียน</h1>
+            <p class="text-gray-300 mt-2 text-sm font-light tracking-wider opacity-90">โรงเรียนวังน้ำคู้ศึกษา</p>
         </div>
     </div>
 
-    <!-- Main Content Container (ลอยทับ Header) -->
-    <div class="max-w-4xl mx-auto px-4 -mt-10 mb-10">
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-4 md:p-8">
+    <!-- Main Content Container (ลอยทับ Header และแก้บัคซ้อนทับด้วย z-10) -->
+    <div class="max-w-4xl mx-auto px-4 -mt-16 mb-10 relative z-10">
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-5 md:p-8">
             
             <!-- แท็บเมนู -->
-            <div class="flex bg-gray-50 p-1.5 rounded-2xl mb-8">
-                <button id="tab-attendance" class="flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl bg-white text-navy-800 shadow-sm transition-all">📝 เช็คชื่อ</button>
-                <button id="tab-summary" class="flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl text-gray-400 hover:text-navy-700 transition-all">📊 สรุปผล</button>
+            <div class="flex bg-gray-100/80 p-1.5 rounded-2xl mb-8 shadow-inner">
+                <button id="tab-attendance" class="flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl bg-white text-navy-800 shadow transition-all duration-300 ease-in-out transform scale-100">📝 เช็คชื่อ</button>
+                <button id="tab-summary" class="flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl text-gray-500 hover:text-navy-700 hover:bg-gray-50/50 transition-all duration-300 ease-in-out">📊 สรุปผล</button>
             </div>
 
             <!-- หน้าต่างโหลดข้อมูลตอนเริ่ม -->
@@ -65,36 +74,44 @@
 
             <div id="main-content" class="hidden">
                 <!-- ส่วนเลือกรายวิชา (UI ใหม่ ขอบมน) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div id="date-container" class="relative">
-                        <label class="absolute -top-2.5 left-4 bg-white px-2 text-xs font-semibold text-navy-700">วันที่</label>
-                        <input type="date" id="attendance-date" class="w-full bg-transparent border-2 border-gray-200 rounded-2xl p-3.5 text-gray-700 focus:border-gold-500 focus:ring-0 outline-none transition-colors" required>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+                    <div id="date-container" class="relative group">
+                        <label class="absolute -top-2.5 left-4 bg-white px-2 text-xs font-semibold text-navy-700 transition-colors group-focus-within:text-gold-500">วันที่</label>
+                        <input type="date" id="attendance-date" class="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 text-gray-700 focus:border-gold-500 focus:ring-4 focus:ring-gold-500/10 outline-none transition-all shadow-sm" required>
                     </div>
-                    <div id="period-container" class="relative">
-                        <label class="absolute -top-2.5 left-4 bg-white px-2 text-xs font-semibold text-navy-700">คาบเรียนที่</label>
-                        <select id="attendance-period" class="w-full bg-transparent border-2 border-gray-200 rounded-2xl p-3.5 text-gray-700 focus:border-gold-500 focus:ring-0 outline-none transition-colors appearance-none" required>
-                            <option value="">-- เลือกคาบ --</option>
+                    <div id="period-container" class="relative group">
+                        <label class="absolute -top-2.5 left-4 bg-white px-2 text-xs font-semibold text-navy-700 transition-colors group-focus-within:text-gold-500">คาบเรียนที่</label>
+                        <select id="attendance-period" class="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 text-gray-700 focus:border-gold-500 focus:ring-4 focus:ring-gold-500/10 outline-none transition-all shadow-sm appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>-- เลือกคาบเรียน --</option>
                             <option value="1">คาบ 1</option><option value="2">คาบ 2</option>
                             <option value="3">คาบ 3</option><option value="4">คาบ 4</option>
                             <option value="5">คาบ 5</option><option value="6">คาบ 6</option>
                             <option value="7">คาบ 7</option><option value="8">คาบ 8</option>
                         </select>
+                        <!-- ไอคอนลูกศร Dropdown -->
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                            <svg class="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
                     </div>
-                    <div class="relative">
-                        <label class="absolute -top-2.5 left-4 bg-white px-2 text-xs font-semibold text-navy-700">รายวิชา</label>
-                        <select id="subject-select" class="w-full bg-transparent border-2 border-gray-200 rounded-2xl p-3.5 text-gray-700 focus:border-gold-500 focus:ring-0 outline-none transition-colors appearance-none" required>
-                            <option value="">-- เลือกรายวิชา --</option>
+                    <div class="relative group">
+                        <label class="absolute -top-2.5 left-4 bg-white px-2 text-xs font-semibold text-navy-700 transition-colors group-focus-within:text-gold-500">รายวิชา</label>
+                        <select id="subject-select" class="w-full bg-white border-2 border-gray-200 rounded-2xl p-4 text-gray-700 focus:border-gold-500 focus:ring-4 focus:ring-gold-500/10 outline-none transition-all shadow-sm appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>-- เลือกรายวิชา --</option>
                         </select>
+                        <!-- ไอคอนลูกศร Dropdown -->
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                            <svg class="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
                     </div>
                 </div>
 
                 <!-- แท็บที่ 1: รายชื่อนักเรียน (ฟอร์มเช็คชื่อ) -->
                 <div id="view-attendance" class="block">
-                    <div id="student-list-container" class="hidden">
+                    <div id="student-list-container" class="hidden animate-fade-in-up">
                         <div class="flex justify-between items-center mb-5 px-2">
-                            <h2 class="text-xl font-bold text-navy-900">รายชื่อนักเรียน <span id="room-display" class="text-gold-500 font-medium text-lg"></span></h2>
+                            <h2 class="text-xl font-bold text-navy-900">รายชื่อนักเรียน <span id="room-display" class="text-gold-500 font-medium text-lg ml-1"></span></h2>
                             <!-- ปุ่มมาเรียนทุกคน โทนสีทอง -->
-                            <button id="mark-all-present-btn" class="flex items-center gap-1.5 text-sm bg-gold-50 hover:bg-gold-100 text-gold-600 py-2 px-4 rounded-xl transition-colors font-semibold border border-gold-200 active:scale-95">
+                            <button id="mark-all-present-btn" class="flex items-center gap-2 text-sm bg-gold-50 hover:bg-gold-500 hover:text-white text-gold-600 py-2.5 px-4 rounded-xl transition-all duration-300 font-semibold border border-gold-200 shadow-sm active:scale-95">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                                 มาทุกคน
                             </button>
@@ -105,10 +122,11 @@
                             <!-- รายชื่อนักเรียนจะถูกสร้างด้วย JS -->
                         </div>
 
-                        <div class="mt-10">
-                            <button id="submit-btn" class="w-full bg-navy-800 hover:bg-navy-900 text-white font-bold py-4 px-6 rounded-2xl shadow-xl shadow-navy-900/20 transition-all duration-200 text-lg flex justify-center items-center gap-2 active:scale-95">
+                        <!-- ทำปุ่มบันทึกให้ลอยติดขอบจอด้านล่าง (Sticky) เวลาเลื่อนรายชื่อ -->
+                        <div class="mt-12 sticky bottom-6 z-20">
+                            <button id="submit-btn" class="w-full bg-navy-800 hover:bg-navy-900 text-white font-bold py-4 px-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(21,42,74,0.4)] transition-all duration-300 text-lg flex justify-center items-center gap-2 active:scale-95">
                                 <span>บันทึกการเช็คชื่อ</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </button>
                         </div>
                     </div>
@@ -215,14 +233,14 @@
             document.getElementById('period-container').style.display = mode === 'summary' ? 'none' : 'block';
 
             if (mode === 'attendance') {
-                tabAtt.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl bg-white text-navy-800 shadow-sm transition-all";
-                tabSum.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl text-gray-400 hover:text-navy-700 transition-all";
+                tabAtt.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl bg-white text-navy-800 shadow transition-all duration-300 ease-in-out transform scale-100";
+                tabSum.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl text-gray-500 hover:text-navy-700 hover:bg-gray-50/50 transition-all duration-300 ease-in-out";
                 viewAtt.classList.remove('hidden');
                 viewSum.classList.add('hidden');
                 renderStudentsForAttendance();
             } else {
-                tabSum.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl bg-white text-navy-800 shadow-sm transition-all";
-                tabAtt.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl text-gray-400 hover:text-navy-700 transition-all";
+                tabSum.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl bg-white text-navy-800 shadow transition-all duration-300 ease-in-out transform scale-100";
+                tabAtt.className = "flex-1 py-3 text-center text-sm md:text-base font-semibold rounded-xl text-gray-500 hover:text-navy-700 hover:bg-gray-50/50 transition-all duration-300 ease-in-out";
                 viewSum.classList.remove('hidden');
                 viewAtt.classList.add('hidden');
                 fetchSummary();
@@ -255,41 +273,41 @@
                 
                 filteredStudents.forEach((student, index) => {
                     const card = document.createElement('div');
-                    // ใส่ transition เพื่อความนุ่มนวลเวลาไฮไลท์สีแดงตอนแจ้งเตือน
-                    card.className = "student-row bg-white border border-gray-100 shadow-sm p-4 rounded-2xl transition-all duration-300";
+                    // ใส่ transition และ hover effect
+                    card.className = "student-row bg-white border border-gray-100 shadow-sm hover:shadow-md p-4 rounded-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1";
                     card.dataset.studentid = student.student_id;
                     
                     // ส่วนชื่อนักเรียน
                     const nameDiv = `
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="bg-navy-50 text-navy-800 font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-navy-50 text-navy-800 font-bold w-10 h-10 rounded-full flex items-center justify-center text-sm shrink-0 shadow-inner">
                                 ${index+1}
                             </div>
                             <div class="flex-1">
-                                <p class="text-base font-semibold text-gray-800">${student.name}</p>
-                                <p class="text-xs text-gray-400 font-medium">รหัส: ${student.student_id}</p>
+                                <p class="text-base font-semibold text-gray-800 leading-tight">${student.name}</p>
+                                <p class="text-xs text-gray-400 font-medium mt-0.5">รหัส: ${student.student_id}</p>
                             </div>
                         </div>
                     `;
 
-                    // ส่วนปุ่มสถานะ (เรียงแบบ Grid 4 ช่องเพื่อมือถือ และ *เอา checked ออก*)
+                    // ส่วนปุ่มสถานะ (มีเงาสะท้อนเวลากดเลือก)
                     const statusDiv = `
-                        <div class="grid grid-cols-4 gap-2 w-full">
-                            <label class="cursor-pointer">
+                        <div class="grid grid-cols-4 gap-2.5 w-full">
+                            <label class="cursor-pointer relative">
                                 <input type="radio" name="status_${student.student_id}" value="มา" class="peer status-radio-present">
-                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-100 peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 peer-checked:shadow-md transition-all active:scale-95">มา</div>
+                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-200 peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 peer-checked:shadow-lg peer-checked:shadow-green-500/30 transition-all duration-200 active:scale-95">มา</div>
                             </label>
-                            <label class="cursor-pointer">
+                            <label class="cursor-pointer relative">
                                 <input type="radio" name="status_${student.student_id}" value="ขาด" class="peer">
-                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-100 peer-checked:bg-red-500 peer-checked:text-white peer-checked:border-red-500 peer-checked:shadow-md transition-all active:scale-95">ขาด</div>
+                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-200 peer-checked:bg-red-500 peer-checked:text-white peer-checked:border-red-500 peer-checked:shadow-lg peer-checked:shadow-red-500/30 transition-all duration-200 active:scale-95">ขาด</div>
                             </label>
-                            <label class="cursor-pointer">
+                            <label class="cursor-pointer relative">
                                 <input type="radio" name="status_${student.student_id}" value="ลา" class="peer">
-                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-100 peer-checked:bg-gold-500 peer-checked:text-white peer-checked:border-gold-500 peer-checked:shadow-md transition-all active:scale-95">ลา</div>
+                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-200 peer-checked:bg-gold-500 peer-checked:text-white peer-checked:border-gold-500 peer-checked:shadow-lg peer-checked:shadow-gold-500/30 transition-all duration-200 active:scale-95">ลา</div>
                             </label>
-                            <label class="cursor-pointer">
+                            <label class="cursor-pointer relative">
                                 <input type="radio" name="status_${student.student_id}" value="สาย" class="peer">
-                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-100 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 peer-checked:shadow-md transition-all active:scale-95">สาย</div>
+                                <div class="text-center py-2.5 text-sm font-semibold rounded-xl text-gray-500 bg-gray-50 border border-gray-200 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 peer-checked:shadow-lg peer-checked:shadow-orange-500/30 transition-all duration-200 active:scale-95">สาย</div>
                             </label>
                         </div>
                     `;
